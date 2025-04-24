@@ -24,7 +24,7 @@ const pool = mysql.createPool({
   database: parsed.pathname.replace('/', ''),
   waitForConnections: true,
   connectionLimit: 10
-});
+}).promise();
 
 // Obtener maestros
 app.get('/maestros', async (req, res) => {
