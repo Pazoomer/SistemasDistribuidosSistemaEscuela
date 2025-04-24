@@ -52,5 +52,5 @@ app.post('/maestros', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor escuchando en http://localhost:${PORT}`);
+  console.log(`Servidor escuchando en puerto: ${PORT}`);
 });
