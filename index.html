@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Moodle</title>
+  <link rel="icon" href="/images/moodle.png" type="image/x-icon">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/bootstrap-icons.css" rel="stylesheet">
+  <link href="css/templatemo-kind-heart-charity.css" rel="stylesheet">
+</head>
+
+<body>
+
+  <div class="container mt-5">
+    <h2>Datos de Maestros</h2>
+    <div id="datos" class="row gy-3"></div>
+  </div>
+
+  <div class="container mt-5">
+    <h2>Agregar Maestro Firebase</h2>
+    <form id="formularioMaestro">
+      <div class="mb-3">
+        <label class="form-label">Nombre Completo</label>
+        <input type="text" class="form-control" id="nombre_completo" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">CURP</label>
+        <input type="text" class="form-control" id="curp" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">RFC</label>
+        <input type="text" class="form-control" id="rfc" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Correo</label>
+        <input type="email" class="form-control" id="correo" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Teléfono</label>
+        <input type="text" class="form-control" id="telefono" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Dirección</label>
+        <input type="text" class="form-control" id="direccion" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Agregar</button>
+    </form>
+  </div>
+
+  <div class="container mt-5">
+    <h2>Agregar Maestro MySQL</h2>
+    <form id="formularioMySQL">
+      <div class="mb-3">
+        <label class="form-label">Nombre Completo</label>
+        <input type="text" class="form-control" id="nombre_completo_mysql" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">CURP</label>
+        <input type="text" class="form-control" id="curp_mysql" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">RFC</label>
+        <input type="text" class="form-control" id="rfc_mysql" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Correo</label>
+        <input type="email" class="form-control" id="correo_mysql" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Teléfono</label>
+        <input type="text" class="form-control" id="telefono_mysql" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Dirección</label>
+        <input type="text" class="form-control" id="direccion_mysql" required>
+      </div>
+      <button type="submit" class="btn btn-success">Agregar a MySQL</button>
+    </form>
+  </div>
+
+  <!-- JavaScript -->
+  <script type="module">
+    import { cargarDatos, agregarDatosEjemplo, agregarMaestro } from './js/firebase.js';
+
+    document.getElementById("formularioMaestro").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const datos = {
+        nombre_completo: document.getElementById("nombre_completo").value,
+        curp: document.getElementById("curp").value,
+        rfc: document.getElementById("rfc").value,
+        correo: document.getElementById("correo").value,
+        telefono: document.getElementById("telefono").value,
+        direccion: document.getElementById("direccion").value,
+      };
+
+      try {
+        await agregarMaestro(datos);
+        alert("Maestro agregado correctamente");
+        e.target.reset();
+      } catch (error) {
+        console.error("Error al agregar maestro:", error);
+        alert("Hubo un error");
+      }
+    });
+
+    document.getElementById("formularioMySQL").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const datosMySQL = {
+        nombre_completo: document.getElementById("nombre_completo_mysql").value,
+        curp: document.getElementById("curp_mysql").value,
+        rfc: document.getElementById("rfc_mysql").value,
+        correo: document.getElementById("correo_mysql").value,
+        telefono: document.getElementById("telefono_mysql").value,
+        direccion: document.getElementById("direccion_mysql").value,
+      };
+
+      try {
+        const response = await fetch("http://localhost:3000/maestros", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(datosMySQL),
+        });
+
+        if (!response.ok) throw new Error("Fallo al insertar en MySQL");
+
+        alert("Maestro agregado a MySQL correctamente");
+        e.target.reset();
+      } catch (error) {
+        console.error("Error al agregar maestro a MySQL:", error);
+        alert("Hubo un error al agregar en MySQL");
+      }
+    });
+
+    // Agregar datos de ejemplo una vez
+    //agregarDatosEjemplo();
+
+    // Cargar los datos de Firebase
+    cargarDatos().then(data => {
+      console.log(data);  // Ver en la consola
+      const contenedor = document.getElementById('datos');
+      contenedor.innerHTML = ""; // Limpia antes
+
+      data.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "col-md-4";
+        card.innerHTML = `
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">${item.nombre_completo}</h5>
+        <p class="card-text">
+          <strong>CURP:</strong> ${item.curp}<br>
+          <strong>RFC:</strong> ${item.rfc}<br>
+          <strong>Correo:</strong> ${item.correo}<br>
+          <strong>Teléfono:</strong> ${item.telefono}<br>
+          <strong>Dirección:</strong> ${item.direccion}
+        </p>
+      </div>
+    </div>
+  `;
+        contenedor.appendChild(card);
+      });
+    }).catch(error => {
+      console.error("Error al cargar los datos:", error);
+    });
+  </script>
+
+  <script src="js/jquery.min.js"></script>
+  <!-- <script src="js/bootstrap.min.js"></script> -->
+  <script src="js/jquery.sticky.js"></script>
+  <script src="js/click-scroll.js"></script>
+  <script src="js/counter.js"></script>
+  <script src="js/custom.js"></script>
+
+</body>
+
+</html>

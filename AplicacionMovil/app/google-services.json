@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "505482865718",
+    "project_id": "sistemaescuela-9bc14",
+    "storage_bucket": "sistemaescuela-9bc14.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:505482865718:android:b17a6516f37773400dfc97",
+        "android_client_info": {
+          "package_name": "zamora.jorge.aplicacionescuela"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxwoNVA0P5lYd0sIUIFsSvhnvaOW4_O1M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
