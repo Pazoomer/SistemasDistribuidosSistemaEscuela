@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2');
 const { parse } = require('url');
+const { Console } = require('console');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,6 +11,9 @@ app.use(cors());
 app.use(express.json());
 
 const dbUrl = process.env.DATABASE_URL;
+
+Console.log(`Conectando a la base de datos: ${dbUrl}`);
+
 const parsed = parse(dbUrl);
 const [user, password] = parsed.auth.split(':');
 
