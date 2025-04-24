@@ -1,18 +1,24 @@
-import express from 'express';
-import cors from 'cors';
-import mysql from 'mysql2/promise';
+const express = require('express');
+const cors = require('cors');
+const mysql = require('mysql2');
+const { parse } = require('url');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
+const dbUrl = process.env.DATABASE_URL;
+const parsed = parse(dbUrl);
+const [user, password] = parsed.auth.split(':');
+
 const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: 'password',
-  database: 'escuela',
+  host: parsed.hostname,
+  port: parsed.port,
+  user,
+  password,
+  database: parsed.pathname.replace('/', ''),
   waitForConnections: true,
   connectionLimit: 10
 });
