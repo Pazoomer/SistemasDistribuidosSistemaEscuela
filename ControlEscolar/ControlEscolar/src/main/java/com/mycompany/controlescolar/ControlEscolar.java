@@ -8,9 +8,10 @@ import java.sql.Statement;
 public class ControlEscolar {
 
     public static void main(String[] args) {
-        String url = "jdbc:mysql://localhost:3306/escuela";
+        String url = "jdbc:mysql://hopper.proxy.rlwy.net:47112/railway";
         String usuario = "root";
-        String contraseña = "password"; 
+        String contraseña = "OmSZrDuQpEJWcYPLwRipzZkqDfFtgJpB";
+
         try (Connection conn = DriverManager.getConnection(url, usuario, contraseña)) {
             System.out.println("Conexión exitosa a la base de datos.");
 
