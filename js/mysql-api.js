@@ -12,4 +12,13 @@ export async function cargarDatos() {
     });
     if (!res.ok) throw new Error('Error al agregar maestro');
   }
-  
+
+  //Subir calificaciones de una materia
+  export async function agregarCalificacion(datos) {
+    const res = await fetch('https://sistemasdistribuidossistemaescuela.onrender.com/calificaciones', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    });
+    if (!res.ok) throw new Error('Error al agregar calificacion');
+  }

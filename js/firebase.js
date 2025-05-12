@@ -46,18 +46,80 @@ export async function cargarDatos() {
 
 export async function agregarDatosEjemplo() {
   try {
-    const nuevoMaestroRef = push(ref(db, "maestros"));
-    await set(nuevoMaestroRef, {
+    // 1. Maestro
+    const maestroRef = push(ref(db, "maestros"));
+    const maestroId = maestroRef.key;
+    await set(maestroRef, {
       nombre_completo: "Carlos Devoción",
       curp: "DEVO800101MDF",
       rfc: "DEVO800101MDF",
       correo: "carlos@ejemplo.com",
       telefono: "66244412233",
-      direccion: "Av. Venustio 123"
+      direccion: "Av. Venustiano 123"
     });
-    console.log("Datos de ejemplo agregados correctamente");
+
+    // 2. Materia asignada al maestro
+    const materiaRef = push(ref(db, "materias"));
+    const materiaId = materiaRef.key;
+    await set(materiaRef, {
+      nombre: "Programación Web",
+      id_maestro: maestroId
+    });
+
+    // 3. Tutor
+    const tutorRef = push(ref(db, "tutores"));
+    const tutorId = tutorRef.key;
+    await set(tutorRef, {
+      nombre_completo: "Laura Mendoza",
+      direccion: "Calle Flores 456",
+      parentesco: "Madre",
+      telefono: "6621234567"
+    });
+
+    // 4. Alumno con tutor
+    const alumnoRef = push(ref(db, "alumnos"));
+    const alumnoId = alumnoRef.key;
+    await set(alumnoRef, {
+      nombre_completo: "Luis Torres",
+      curp: "TORL010101HSONRS09",
+      fecha_nacimiento: "2005-08-15",
+      direccion: "Col. Centro #123",
+      genero: "Masculino",
+      telefono: "6628887744",
+      id_tutor: tutorId
+    });
+
+    // 5. Relación alumno-materia
+    const materiaAlumnoRef = push(ref(db, "materias_alumnos"));
+    await set(materiaAlumnoRef, {
+      id_alumno: alumnoId,
+      id_materia: materiaId
+    });
+
+    // 6. Asignación en la materia
+    const asignacionRef = push(ref(db, "asignaciones"));
+    const asignacionId = asignacionRef.key;
+    await set(asignacionRef, {
+      titulo: "Proyecto HTML",
+      descripcion: "Crear una página personal",
+      fecha_limite: "2025-06-01",
+      id_materia: materiaId
+    });
+
+    // 7. Entrega de la asignación por el alumno
+    const entregaRef = push(ref(db, "asignaciones_entregas"));
+    await set(entregaRef, {
+      id_asignacion: asignacionId,
+      id_alumno: alumnoId,
+      archivo_adjunto: "link-a-tu-archivo.html",
+      fecha_entrega: "2025-05-10",
+      estado: "entregado",
+      calificacion: 9.5
+    });
+
+    console.log("Todos los datos de ejemplo se agregaron correctamente");
   } catch (error) {
-    console.error("Error al agregar datos:", error);
+    console.error("Error al agregar datos de ejemplo:", error);
   }
 }
 

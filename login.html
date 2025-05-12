@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Inicio de Sesión</title>
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+  <div class="container mt-5">
+    <h2>Iniciar Sesión</h2>
+    <form id="loginForm">
+      <div class="mb-3">
+        <label for="correo" class="form-label">Correo</label>
+        <input type="email" class="form-control" id="correo" required>
+      </div>
+      <div class="mb-3">
+        <label for="contrasena" class="form-label">Contraseña</label>
+        <input type="password" class="form-control" id="contrasena" required>
+      </div>
+      <div class="mb-3">
+        <label for="rol" class="form-label">Rol</label>
+        <select class="form-select" id="rol" required>
+          <option value="">Selecciona un rol</option>
+          <option value="maestro">Maestro</option>
+          <option value="estudiante">Estudiante</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Entrar</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const correo = document.getElementById("correo").value;
+      const contrasena = document.getElementById("contrasena").value;
+      const rol = document.getElementById("rol").value;
+
+      localStorage.setItem("rol", rol); // maestro o estudiante
+      //localStorage.setItem("id_usuario", id); // ID para usar en la API
+
+      // Simulación simple para redirigir:
+      if (rol === "maestro") {
+        window.location.href = "index.html";
+      } else if (rol === "estudiante") {
+        window.location.href = "index.html";
+      }
+    });
+  </script>
+</body>
+
+</html>

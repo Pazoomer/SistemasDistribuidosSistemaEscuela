@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Asignaciones</title>
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container mt-4">
+    <h2 id="nombreMateria">Asignaciones</h2>
+    <div id="asignaciones" class="row gy-3"></div>
+
+    <!-- Formulario solo para maestros -->
+    <div id="formNuevaAsignacion" style="display:none" class="mt-4">
+      <h4>Crear nueva asignación</h4>
+      <form id="crearAsignacionForm">
+        <input type="text" id="titulo" placeholder="Título" class="form-control mb-2" required>
+        <textarea id="descripcion" placeholder="Descripción" class="form-control mb-2" required></textarea>
+        <input type="date" id="fecha_limite" class="form-control mb-2" required>
+        <button class="btn btn-primary" type="submit">Crear</button>
+      </form>
+    </div>
+  </div>
+  
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const idMateria = params.get("id");
+    const nombreMateria = params.get("nombre");
+    document.getElementById("nombreMateria").textContent = `Asignaciones de ${nombreMateria}`;
+
+    const rol = localStorage.getItem("rol");
+    const idUsuario = localStorage.getItem("id_usuario");
+    const contenedor = document.getElementById("asignaciones");
+
+    if (rol === "maestro") {
+      document.getElementById("formNuevaAsignacion").style.display = "block";
+    }
+
+    async function cargarAsignaciones() {
+      try {
+        const res = await fetch(`https://sistemasdistribuidossistemaescuela.onrender.com/asignaciones/${idMateria}`);
+        const data = await res.json();
+
+        contenedor.innerHTML = "";
+        data.forEach(a => {
+          const div = document.createElement("div");
+          div.className = "col-md-4";
+          div.innerHTML = `
+            <div class="card shadow-sm h-100">
+              <div class="card-body">
+                <h5>${a.titulo}</h5>
+                <p>${a.descripcion}</p>
+                <p><strong>Fecha límite:</strong> ${a.fecha_limite}</p>
+                ${rol === "maestro" ? `
+                  <button onclick="editar(${a.id})" class="btn btn-warning btn-sm">Editar</button>
+                  <button onclick="eliminar(${a.id})" class="btn btn-danger btn-sm">Eliminar</button>
+                ` : `
+                  <button onclick="entregar(${a.id})" class="btn btn-success btn-sm">Entregar</button>
+                `}
+              </div>
+            </div>`;
+          contenedor.appendChild(div);
+        });
+      } catch (err) {
+        console.error("Error al cargar asignaciones:", err);
+      }
+    }
+
+    async function crearAsignacion(e) {
+      e.preventDefault();
+      const datos = {
+        titulo: document.getElementById("titulo").value,
+        descripcion: document.getElementById("descripcion").value,
+        fecha_limite: document.getElementById("fecha_limite").value,
+        id_materia: idMateria
+      };
+      try {
+        const res = await fetch("https://sistemasdistribuidossistemaescuela.onrender.com/asignaciones", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(datos)
+        });
+        if (!res.ok) throw new Error("Error al crear asignación");
+        alert("Asignación creada");
+        document.getElementById("crearAsignacionForm").reset();
+        cargarAsignaciones();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function eliminar(id) {
+      if (!confirm("¿Eliminar esta asignación?")) return;
+      await fetch(`https://sistemasdistribuidossistemaescuela.onrender.com/asignaciones/${id}`, { method: "DELETE" });
+      cargarAsignaciones();
+    }
+
+    function editar(id) {
+      alert("Aquí iría el formulario de edición (puedes implementarlo tú)");
+    }
+
+    function entregar(id_asignacion) {
+      const link = prompt("Pega el link de entrega:");
+      if (!link) return;
+      const hoy = new Date().toISOString().split("T")[0];
+      const estado = "entregado"; // podrías calcular si fue tarde
+
+      fetch("https://sistemasdistribuidossistemaescuela.onrender.com/asignaciones/entregar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id_asignacion,
+          id_alumno: idUsuario,
+          archivo_adjunto: link,
+          fecha_entrega: hoy,
+          estado
+        })
+      }).then(() => {
+        alert("Entrega realizada");
+      }).catch(err => console.error("Error al entregar:", err));
+    }
+
+    document.getElementById("crearAsignacionForm").addEventListener("submit", crearAsignacion);
+    cargarAsignaciones();
+  </script>
+</body>
+</html>
