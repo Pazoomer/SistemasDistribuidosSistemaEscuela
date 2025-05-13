@@ -16,6 +16,7 @@
   <div class="container mt-5">
     <h2>Materias</h2>
     <div id="listaMaterias" class="row gy-3"></div>
+    <button id="cerrarSesionBtn" class="btn btn-danger">Cerrar sesión</button>
   </div>
 
   <script type="module">
@@ -71,6 +72,18 @@
         });
     }
 
+  </script>
+  <script type="module">
+    import { cerrarSesionConFirebase } from './js/firebase.js';
+
+    document.getElementById("cerrarSesionBtn").addEventListener("click", async () => {
+      try {
+        await cerrarSesionConFirebase();
+        window.location.href = "login.html";
+      } catch (err) {
+        console.error(err.message);
+      }
+    });
   </script>
 
   <script type="module">

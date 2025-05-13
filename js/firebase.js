@@ -26,6 +26,21 @@ const db = getDatabase(app);
 console.log("Firebase inicializado correctamente");
 
 /**
+ * Cierra la sesión del usuario autenticado y limpia el localStorage.
+ * @returns {Promise<void>}
+ */
+export async function cerrarSesionConFirebase() {
+  try {
+    await signOut(auth);
+    localStorage.clear();
+    console.log("Sesión cerrada correctamente");
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error);
+    throw new Error("No se pudo cerrar la sesión.");
+  }
+}
+
+/**
  * Inicia sesión con correo y contraseña, y obtiene el ID del usuario desde la base de datos.
  * @param {string} correo - Correo del usuario.
  * @param {string} contrasena - Contraseña del usuario.
