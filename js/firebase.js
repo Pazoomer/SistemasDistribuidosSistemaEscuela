@@ -62,7 +62,7 @@ export async function agregarDatosEjemplo() {
     const materiaRef = push(ref(db, "materias"));
     const materiaId = materiaRef.key;
     await set(materiaRef, {
-      nombre: "Programación Web",
+      nombre: "Seguridad Informática",
       id_maestro: maestroId
     });
 
@@ -70,22 +70,22 @@ export async function agregarDatosEjemplo() {
     const tutorRef = push(ref(db, "tutores"));
     const tutorId = tutorRef.key;
     await set(tutorRef, {
-      nombre_completo: "Laura Mendoza",
-      direccion: "Calle Flores 456",
-      parentesco: "Madre",
-      telefono: "6621234567"
+      nombre_completo: "Mano Buenafuentes",
+      direccion: "Calle Rosas 789",
+      parentesco: "Padre",
+      telefono: "6621234789"
     });
 
     // 4. Alumno con tutor
     const alumnoRef = push(ref(db, "alumnos"));
     const alumnoId = alumnoRef.key;
     await set(alumnoRef, {
-      nombre_completo: "Luis Torres",
-      curp: "TORL010101HSONRS09",
-      fecha_nacimiento: "2005-08-15",
-      direccion: "Col. Centro #123",
+      nombre_completo: "Emilio Mejia",
+      curp: "EMRS020201WSONRS09",
+      fecha_nacimiento: "2001-11-19",
+      direccion: "Col. Medio #456",
       genero: "Masculino",
-      telefono: "6628887744",
+      telefono: "6628884477",
       id_tutor: tutorId
     });
 
@@ -100,9 +100,9 @@ export async function agregarDatosEjemplo() {
     const asignacionRef = push(ref(db, "asignaciones"));
     const asignacionId = asignacionRef.key;
     await set(asignacionRef, {
-      titulo: "Proyecto HTML",
-      descripcion: "Crear una página personal",
-      fecha_limite: "2025-06-01",
+      titulo: "Proyecto web",
+      descripcion: "Crear una página web",
+      fecha_limite: "2025-06-03",
       id_materia: materiaId
     });
 
@@ -112,9 +112,9 @@ export async function agregarDatosEjemplo() {
       id_asignacion: asignacionId,
       id_alumno: alumnoId,
       archivo_adjunto: "link-a-tu-archivo.html",
-      fecha_entrega: "2025-05-10",
+      fecha_entrega: "2025-06-01",
       estado: "entregado",
-      calificacion: 9.5
+      calificacion: 6.8
     });
 
     console.log("Todos los datos de ejemplo se agregaron correctamente");
