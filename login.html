@@ -32,22 +32,27 @@
   </div>
 
   <script>
-    document.getElementById("loginForm").addEventListener("submit", (e) => {
+    import { loginConFirebase } from './firebase.js';
+
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const correo = document.getElementById("correo").value;
       const contrasena = document.getElementById("contrasena").value;
       const rol = document.getElementById("rol").value;
 
-      localStorage.setItem("rol", rol); // maestro o estudiante
-      //localStorage.setItem("id_usuario", id); // ID para usar en la API
+      try {
+        const user = await loginConFirebase(correo, contrasena, rol);
+        localStorage.setItem("id", user.id);
+        localStorage.setItem("correo", user.correo);
+        localStorage.setItem("rol", user.rol);
 
-      // Simulación simple para redirigir:
-      if (rol === "maestro") {
         window.location.href = "index.html";
-      } else if (rol === "estudiante") {
-        window.location.href = "index.html";
+      } catch (err) {
+        alert(err.message);
+        console.error(err);
       }
     });
+
   </script>
 </body>
 

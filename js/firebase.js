@@ -25,6 +25,39 @@ const db = getDatabase(app);
 
 console.log("Firebase inicializado correctamente");
 
+/**
+ * Inicia sesión con correo y contraseña, y obtiene el ID del usuario desde la base de datos.
+ * @param {string} correo - Correo del usuario.
+ * @param {string} contrasena - Contraseña del usuario.
+ * @param {string} rol - "maestro" o "alumno".
+ * @returns {Promise<{ id: string, correo: string, rol: string }>} - Info del usuario logueado.
+ */
+export async function loginConFirebase(correo, contrasena, rol) {
+  try {
+    // 1. Login con autenticación
+    await signInWithEmailAndPassword(auth, correo, contrasena);
+
+    // 2. Buscar ID en la colección correspondiente
+    const ruta = rol === "maestro" ? "maestros" : "alumnos";
+    const snapshot = await get(ref(db, ruta));
+
+    if (!snapshot.exists()) {
+      throw new Error("No se encontraron datos en Firebase.");
+    }
+
+    const datos = snapshot.val();
+    for (const id in datos) {
+      if (datos[id].correo === correo) {
+        return { id, correo, rol };
+      }
+    }
+
+    throw new Error("Correo no registrado en la base de datos.");
+  } catch (error) {
+    throw new Error(`Error al iniciar sesión: ${error.message}`);
+  }
+}
+
 export async function cargarDatos() {
   const dbRef = ref(getDatabase());
   try {
@@ -41,6 +74,66 @@ export async function cargarDatos() {
   } catch (error) {
     console.error("Error al cargar datos:", error);
     throw error;
+  }
+}
+
+export async function cargarMateriasPorMaestro(idMaestro) {
+  try {
+    const dbRef = ref(getDatabase());
+    const snapshot = await get(child(dbRef, "materias"));
+
+    if (snapshot.exists()) {
+      const materias = snapshot.val();
+      // Filtra las materias por el id del maestro
+      const materiasDelMaestro = Object.entries(materias)
+        .filter(([_, materia]) => materia.idMaestro === idMaestro)
+        .map(([id, materia]) => ({ id, ...materia }));
+
+      return materiasDelMaestro;
+    } else {
+      console.warn("No hay materias registradas");
+      return [];
+    }
+  } catch (error) {
+    console.error("Error al cargar materias por maestro:", error);
+    return [];
+  }
+}
+
+export async function cargarMateriasPorAlumno(idAlumno) {
+  const db = getDatabase();
+
+  try {
+    // 1. Obtener relaciones materias_alumnos
+    const relSnap = await get(ref(db, "materias_alumnos"));
+    if (!relSnap.exists()) return [];
+
+    const relaciones = relSnap.val();
+    const idMaterias = [];
+
+    for (const key in relaciones) {
+      if (relaciones[key].id_alumno === idAlumno) {
+        idMaterias.push(relaciones[key].id_materia);
+      }
+    }
+
+    // 2. Obtener materias
+    const materiasSnap = await get(ref(db, "materias"));
+    if (!materiasSnap.exists()) return [];
+
+    const materias = materiasSnap.val();
+    const materiasDelAlumno = [];
+
+    for (const key in materias) {
+      if (idMaterias.includes(key)) {
+        materiasDelAlumno.push({ id: key, ...materias[key] });
+      }
+    }
+
+    return materiasDelAlumno;
+  } catch (error) {
+    console.error("Error al cargar materias del estudiante:", error);
+    return [];
   }
 }
 
@@ -86,6 +179,7 @@ export async function agregarDatosEjemplo() {
       direccion: "Col. Medio #456",
       genero: "Masculino",
       telefono: "6628884477",
+      correo: "emilio@gmail.com",
       id_tutor: tutorId
     });
 
