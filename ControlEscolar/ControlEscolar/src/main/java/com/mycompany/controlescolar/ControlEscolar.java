@@ -40,5 +40,9 @@ public class ControlEscolar {
             e.printStackTrace();
         }
     }
+    
+    private void ObtenerMaestrosSinCalificaciones(){
+        
+    }
 
 }
