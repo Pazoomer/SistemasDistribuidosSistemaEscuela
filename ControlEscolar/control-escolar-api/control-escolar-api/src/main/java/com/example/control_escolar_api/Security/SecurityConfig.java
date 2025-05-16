@@ -25,7 +25,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, @Qualifier("jwtFilterBean") JwtFilter jwtFilter) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable()) // Forma actualizada para deshabilitar CSRF
+                .csrf(AbstractHttpConfigurer::disable) // Forma actualizada para deshabilitar CSRF
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login").permitAll()  // Permitir acceso al login
                         .anyRequest().authenticated()         // Requiere autenticación en otros endpoints
