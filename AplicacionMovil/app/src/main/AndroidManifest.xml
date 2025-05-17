@@ -13,7 +13,7 @@
         android:theme="@style/Theme.AplicacionEscuela"
         tools:targetApi="31">
         <activity
-            android:name=".Mensaje"
+            android:name=".Chat"
             android:exported="false" />
         <activity
             android:name=".Mensajes"
