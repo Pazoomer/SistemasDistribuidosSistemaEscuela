@@ -7,7 +7,7 @@ import java.util.List;
 
 @Service
 public class MaestroService {
-    private final MaestroRepository repo;
+    private MaestroRepository repo;
 
     public MaestroService(MaestroRepository repo) {
         this.repo = repo;
