@@ -25,6 +25,9 @@
     const rol = localStorage.getItem("rol");
     const correoUsuario = localStorage.getItem("correo");
     const idUsuario = localStorage.getItem("id");
+    console.log("ID de usuario:", idUsuario);
+    console.log("Correo de usuario:", correoUsuario);
+    console.log("Rol de usuario:", rol);
 
     if (!rol) {
       window.location.href = "login.html"; // Si no hay sesión, redirige

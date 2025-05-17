@@ -45,6 +45,7 @@
         localStorage.setItem("id", user.id);
         localStorage.setItem("correo", user.correo);
         localStorage.setItem("rol", user.rol);
+        console.log("Usuario autenticado:", user);
 
         window.location.href = "index.html";
       } catch (err) {
