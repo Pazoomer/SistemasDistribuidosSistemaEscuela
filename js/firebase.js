@@ -70,7 +70,7 @@ export async function obtenerCalificacionesPorMaestro(idMaestro) {
 
             // 5. Obtener CURP del alumno
             resultados.push(
-              get(child(dbRef, `usuarios/${idAlumno}`)).then(usuarioSnap => {
+              get(child(dbRef, `alumnos/${idAlumno}`)).then(usuarioSnap => {
                 const usuario = usuarioSnap.val();
                 return {
                   idMaestro: idMaestro,
