@@ -65,9 +65,17 @@
             lista.innerHTML = "<li>No hay materias asignadas</li>";
           } else {
             materias.forEach(materia => {
-              const li = document.createElement("li");
-              li.textContent = materia.nombre;
-              lista.appendChild(li);
+              const col = document.createElement("div");
+              col.className = "col-12 col-md-4";
+
+              col.innerHTML =
+                '<div class="card h-100 shadow-sm">' +
+                '<div class="card-body">' +
+                '<h5 class="card-title">' + materia.nombre + '</h5>' +
+                '<p class="card-text"><strong>ID:</strong> ' + materia.id + '</p>' +
+                '</div>' +
+                '</div>';
+              lista.appendChild(col);
             });
           }
         })
