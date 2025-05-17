@@ -14,8 +14,13 @@
 
     <div id="asignaciones" class="row gy-3"></div>
 
+    <!-- Botón para mostrar/ocultar el formulario -->
+    <button class="btn btn-secondary mb-2" id="toggleFormBtn">
+      Crear nueva asignación
+    </button>
+
     <!-- Formulario solo para maestros -->
-    <div id="formNuevaAsignacion" style="display:none" class="mt-4">
+    <div id="formNuevaAsignacion" style="display: none;" class="mt-2">
       <h4>Crear nueva asignación</h4>
       <form id="crearAsignacionForm">
         <input type="text" id="titulo" placeholder="Título" class="form-control mb-2" required>
@@ -87,11 +92,7 @@
         card.addEventListener("click", () => {
           localStorage.setItem("asignacionSeleccionada", JSON.stringify(asignacion));
           localStorage.setItem("materiaSeleccionada", JSON.stringify(materia));
-          localStorage.setItem("usuarioActual", JSON.stringify({
-            id: idUsuario,
-            correo: correoUsuario,
-            rol: rol
-          }));
+          localStorage.setItem("usuarioActual", JSON.stringify({usuario}));
           window.location.href = "asignacion.html";
         });
       });
@@ -114,6 +115,11 @@
       await crearAsignacion(nueva);
       form.reset();
       mostrarAsignaciones();
+    });
+
+    document.getElementById("toggleFormBtn").addEventListener("click", () => {
+      const formDiv = document.getElementById("formNuevaAsignacion");
+      formDiv.style.display = formDiv.style.display === "none" ? "block" : "none";
     });
   </script>
 </body>
