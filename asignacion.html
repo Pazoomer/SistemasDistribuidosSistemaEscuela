@@ -51,6 +51,7 @@
         const asignacion = JSON.parse(localStorage.getItem("asignacionSeleccionada"));
         const usuario = JSON.parse(localStorage.getItem("usuarioActual"));
 
+        console.log("Asignacion seleccionada:", asignacion);
         // Mostrar datos
         document.getElementById("tituloAsignacion").textContent = asignacion.titulo;
         document.getElementById("descripcionAsignacion").textContent = asignacion.descripcion;
