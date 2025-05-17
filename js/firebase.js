@@ -102,9 +102,8 @@ export async function cargarMateriasPorMaestro(idMaestro) {
 
     if (snapshot.exists()) {
       const materias = snapshot.val();
-      // Filtra las materias por el id del maestro
       const materiasDelMaestro = Object.entries(materias)
-        .filter(([_, materia]) => materia.idMaestro === idMaestro)
+        .filter(([_, materia]) => materia.id_maestro === idMaestro)
         .map(([id, materia]) => ({ id, ...materia }));
 
       return materiasDelMaestro;
@@ -117,6 +116,7 @@ export async function cargarMateriasPorMaestro(idMaestro) {
     return [];
   }
 }
+
 
 export async function cargarMateriasPorAlumno(idAlumno) {
   const db = getDatabase();
