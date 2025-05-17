@@ -47,6 +47,7 @@
             entregarAsignacion
         } from './js/firebase.js';
 
+        const materia = JSON.parse(localStorage.getItem("materiaSeleccionada"));
         const asignacion = JSON.parse(localStorage.getItem("asignacionSeleccionada"));
         const usuario = JSON.parse(localStorage.getItem("usuarioActual"));
 

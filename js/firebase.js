@@ -28,6 +28,73 @@ const auth = getAuth(app);
 
 console.log("Firebase inicializado correctamente");
 
+export async function obtenerCalificacionesPorMaestro(idMaestro) {
+  const dbRef = ref(getDatabase());
+
+  try {
+    // 1. Obtener materias del maestro
+    const materiasSnap = await get(child(dbRef, 'materias'));
+    const materias = [];
+    materiasSnap.forEach(snap => {
+      const materia = snap.val();
+      if (materia.id_maestro === idMaestro) {
+        materia.id = snap.key;
+        materias.push(materia);
+      }
+    });
+
+    const resultados = [];
+
+    // 2. Recorrer materias
+    for (const materia of materias) {
+      // 3. Obtener asignaciones por materia
+      const asignacionesSnap = await get(child(dbRef, 'asignaciones'));
+      const asignaciones = [];
+      asignacionesSnap.forEach(snap => {
+        const asignacion = snap.val();
+        if (asignacion.id_materia === materia.id) {
+          asignacion.id = snap.key;
+          asignaciones.push(asignacion);
+        }
+      });
+
+      // 4. Recorrer asignaciones
+      for (const asignacion of asignaciones) {
+        const entregasSnap = await get(child(dbRef, 'asignaciones_entregas'));
+
+        entregasSnap.forEach(entregaSnap => {
+          const entrega = entregaSnap.val();
+          if (entrega.id_asignacion === asignacion.id) {
+            const idAlumno = entrega.id_alumno;
+            const calificacion = entrega.calificacion || null;
+
+            // 5. Obtener CURP del alumno
+            resultados.push(
+              get(child(dbRef, `usuarios/${idAlumno}`)).then(usuarioSnap => {
+                const usuario = usuarioSnap.val();
+                return {
+                  idMaestro: idMaestro,
+                  curp: usuario.curp,
+                  materia: materia.nombre,
+                  asignacion: asignacion.titulo,
+                  calificacion: calificacion
+                };
+              })
+            );
+          }
+        });
+      }
+    }
+
+    // 6. Esperar todas las consultas de CURP
+    return await Promise.all(resultados);
+
+  } catch (error) {
+    console.error("Error al obtener calificaciones:", error);
+    return [];
+  }
+}
+
 /**
  * Cierra la sesión del usuario autenticado y limpia el localStorage.
  * @returns {Promise<void>}
@@ -138,6 +205,7 @@ export async function crearAsignacion(asignacion) {
   await set(nuevaRef, asignacion);
 }
 
+//Obtiene todas las calificaciones de todas las materias de un maestro
 
 export async function cargarMateriasPorAlumno(idAlumno) {
   const db = getDatabase();

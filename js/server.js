@@ -26,6 +26,38 @@ const pool = mysql.createPool({
   connectionLimit: 10
 }).promise();
 
+app.post('/subir-calificaciones', async (req, res) => {
+  const calificaciones = req.body; // Debe ser un array de objetos
+
+  if (!Array.isArray(calificaciones)) {
+    return res.status(400).json({ error: "Se esperaba un array de calificaciones" });
+  }
+
+  try {
+    for (const cal of calificaciones) {
+      const {
+        curp_alumno,
+        materia,
+        nombre_asignacion,
+        calificacion,
+        id_maestro
+      } = cal;
+
+      // Insertar en la tabla calificaciones
+      await pool.query(
+        `INSERT INTO calificaciones (curp_alumno, materia, nombre_asignacion, calificacion, id_maestro) 
+         VALUES (?, ?, ?, ?, ?)`,
+        [curp_alumno, materia, nombre_asignacion, calificacion, id_maestro]
+      );
+    }
+
+    res.status(200).json({ mensaje: "Calificaciones guardadas correctamente" });
+  } catch (error) {
+    console.error("Error al subir calificaciones:", error);
+    res.status(500).json({ error: "Error interno al subir calificaciones" });
+  }
+});
+
 // Obtener usuario por correo y contraseña
 app.post('/login', async (req, res) => {
   const { correo, contrasena } = req.body;
@@ -47,6 +79,8 @@ app.listen(PORT, () => {
 });
 
 // Rol: Maestros
+// Subir calificaciones de un maestro (Maestro, Materias, asignaciones, asignaciones-entregas, curp del alumno, calificacion)
+
 // Crear asignacion (Titulo, Descripcion, Fecha limite, Materia)
 app.post('/asignaciones', async (req, res) => {
   const { titulo, descripcion, fecha_limite, id_materia } = req.body;
@@ -248,7 +282,6 @@ app.post('/insertar-firebase', async (req, res) => {
     res.status(500).send(`Error al insertar en Firebase: ${err.message}`);
   }
 });
-
 
 // Obtener maestros
 app.get('/maestros', async (req, res) => {

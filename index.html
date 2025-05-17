@@ -14,21 +14,21 @@
 <body>
 
   <div class="container mt-5">
-  <h2>Materias</h2>
+    <h2>Materias</h2>
 
-  <div id="subirCalificacionesDiv" class="mb-3" style="display: none;">
-    <button class="btn btn-primary" onclick="window.location.href='calificaciones.html'">
-      Subir calificaciones
-    </button>
+    <div id="subirCalificacionesDiv" class="mb-3" style="display: none;">
+      <button class="btn btn-primary" onclick="window.location.href='calificaciones.html'">
+        Subir calificaciones
+      </button>
+    </div>
+
+    <div id="listaMaterias" class="row gy-3"></div>
+    <button id="cerrarSesionBtn" class="btn btn-danger">Cerrar sesión</button>
   </div>
-
-  <div id="listaMaterias" class="row gy-3"></div>
-  <button id="cerrarSesionBtn" class="btn btn-danger">Cerrar sesión</button>
-</div>
 
 
   <script type="module">
-    import { cargarMateriasPorMaestro } from './js/firebase.js';
+    import { cargarMateriasPorMaestro, obtenerCalificacionesPorMaestro } from './js/firebase.js';
     // Obtener el ID del usuario desde localStorage
     const rol = localStorage.getItem("rol");
     const correoUsuario = localStorage.getItem("correo");
@@ -72,7 +72,38 @@
         });
 
     } else if (rol === "maestro") {
+      //Boton para subir calificaciones
       document.getElementById("subirCalificacionesDiv").style.display = "block";
+      const btn = document.getElementById("subirCalificacionesDiv");
+      if (btn) {
+        btn.addEventListener("click", async () => {
+          const idMaestro = localStorage.getItem("id");
+          const calificaciones = await obtenerCalificacionesPorMaestro(idMaestro);
+
+          try {
+            const response = await fetch('https://sistemasdistribuidossistemaescuela.onrender.com/subir-calificaciones', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(calificaciones)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              alert("Calificaciones subidas correctamente");
+            } else {
+              console.error(data);
+              alert("Error al subir calificaciones");
+            }
+          } catch (error) {
+            console.error("Error al hacer la petición:", error);
+            alert("No se pudo conectar con el servidor");
+          }
+        });
+      }
+      // Cargar materias
       cargarMateriasPorMaestro(idUsuario)
         .then(materias => {
           console.log("Materias filtradas:", materias);

@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Materia</title>
   <link href="css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
   <div class="container mt-4">
     <h2 id="nombreMateria">Asignaciones</h2>
@@ -84,6 +86,12 @@
 
         card.addEventListener("click", () => {
           localStorage.setItem("asignacionSeleccionada", JSON.stringify(asignacion));
+          localStorage.setItem("materiaSeleccionada", JSON.stringify(materia));
+          localStorage.setItem("usuarioActual", JSON.stringify({
+            id: idUsuario,
+            correo: correoUsuario,
+            rol: rol
+          }));
           window.location.href = "asignacion.html";
         });
       });
@@ -109,4 +117,5 @@
     });
   </script>
 </body>
+
 </html>
