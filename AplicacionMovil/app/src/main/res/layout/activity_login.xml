@@ -94,6 +94,8 @@
         android:layout_marginRight="30dp"
         android:layout_marginBottom="16dp"
         android:text="Iniciar sesión"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#F44336"
         android:textSize="20sp"
         app:cornerRadius="20dp" />
 
