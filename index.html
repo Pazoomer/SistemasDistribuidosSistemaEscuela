@@ -57,6 +57,7 @@
     } else if (rol === "maestro") {
       cargarMateriasPorMaestro(idUsuario)
         .then(materias => {
+          console.log("Materias filtradas:", materias);
           const lista = document.getElementById("listaMaterias");
           lista.innerHTML = ""; // Limpiar antes de insertar
 
