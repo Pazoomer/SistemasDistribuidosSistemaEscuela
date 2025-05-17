@@ -117,6 +117,27 @@ export async function cargarMateriasPorMaestro(idMaestro) {
   }
 }
 
+export async function cargarAsignacionesPorMateria(idMateria) {
+  const dbRef = ref(getDatabase());
+  const snapshot = await get(child(dbRef, "asignaciones"));
+
+  if (snapshot.exists()) {
+    const data = snapshot.val();
+    return Object.entries(data)
+      .filter(([_, asignacion]) => asignacion.id_materia === idMateria)
+      .map(([id, asignacion]) => ({ id, ...asignacion }));
+  }
+
+  return [];
+}
+
+// Este método es para guardar una nueva asignación (si no lo tienes)
+export async function crearAsignacion(asignacion) {
+  const db = getDatabase();
+  const nuevaRef = push(ref(db, "asignaciones"));
+  await set(nuevaRef, asignacion);
+}
+
 
 export async function cargarMateriasPorAlumno(idAlumno) {
   const db = getDatabase();

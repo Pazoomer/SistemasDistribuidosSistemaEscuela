@@ -14,10 +14,18 @@
 <body>
 
   <div class="container mt-5">
-    <h2>Materias</h2>
-    <div id="listaMaterias" class="row gy-3"></div>
-    <button id="cerrarSesionBtn" class="btn btn-danger">Cerrar sesión</button>
+  <h2>Materias</h2>
+
+  <div id="subirCalificacionesDiv" class="mb-3" style="display: none;">
+    <button class="btn btn-primary" onclick="window.location.href='calificaciones.html'">
+      Subir calificaciones
+    </button>
   </div>
+
+  <div id="listaMaterias" class="row gy-3"></div>
+  <button id="cerrarSesionBtn" class="btn btn-danger">Cerrar sesión</button>
+</div>
+
 
   <script type="module">
     import { cargarMateriasPorMaestro } from './js/firebase.js';
@@ -64,6 +72,7 @@
         });
 
     } else if (rol === "maestro") {
+      document.getElementById("subirCalificacionesDiv").style.display = "block";
       cargarMateriasPorMaestro(idUsuario)
         .then(materias => {
           console.log("Materias filtradas:", materias);

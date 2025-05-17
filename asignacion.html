@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Asignación</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-4">
+        <h2 id="tituloAsignacion">Título</h2>
+        <p id="descripcionAsignacion">Descripción</p>
+        <p id="fechaLimiteAsignacion">Fecha límite:</p>
+
+        <!-- Solo alumnos -->
+        <div id="formEntrega" style="display:none" class="mt-4">
+            <h4>Entregar asignación</h4>
+            <form id="entregaForm">
+                <input type="url" id="archivoAdjunto" class="form-control mb-2" placeholder="Link al archivo"
+                    required />
+                <button class="btn btn-success">Entregar</button>
+            </form>
+        </div>
+
+        <!-- Solo maestros -->
+        <div id="formEditar" style="display:none" class="mt-4">
+            <h4>Editar asignación</h4>
+            <form id="editarForm">
+                <input type="text" id="editarTitulo" class="form-control mb-2" required />
+                <textarea id="editarDescripcion" class="form-control mb-2" required></textarea>
+                <input type="date" id="editarFecha" class="form-control mb-2" required />
+                <button class="btn btn-warning">Guardar cambios</button>
+            </form>
+        </div>
+
+        <!-- Botón volver -->
+        <div class="mt-4">
+            <button class="btn btn-secondary" onclick="volverAMateria()">Volver a la materia</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import {
+            editarAsignacion,
+            entregarAsignacion
+        } from './js/firebase.js';
+
+        const asignacion = JSON.parse(localStorage.getItem("asignacionSeleccionada"));
+        const usuario = JSON.parse(localStorage.getItem("usuarioActual"));
+
+        // Mostrar datos
+        document.getElementById("tituloAsignacion").textContent = asignacion.titulo;
+        document.getElementById("descripcionAsignacion").textContent = asignacion.descripcion;
+        document.getElementById("fechaLimiteAsignacion").textContent = `Fecha límite: ${asignacion.fecha_limite}`;
+
+        // Mostrar formularios según rol
+        if (usuario.rol === "estudiante") {
+            document.getElementById("formEntrega").style.display = "block";
+        } else if (usuario.rol === "maestro") {
+            document.getElementById("formEditar").style.display = "block";
+            // Prefill datos
+            document.getElementById("editarTitulo").value = asignacion.titulo;
+            document.getElementById("editarDescripcion").value = asignacion.descripcion;
+            document.getElementById("editarFecha").value = asignacion.fecha_limite;
+        }
+
+        // Entrega
+        document.getElementById("entregaForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const link = document.getElementById("archivoAdjunto").value;
+            const hoy = new Date().toISOString().split("T")[0];
+            const estado = "entregado";
+
+            await entregarAsignacion({
+                id_asignacion: asignacion.id,
+                id_alumno: usuario.id,
+                archivo_adjunto: link,
+                fecha_entrega: hoy,
+                estado
+            });
+
+            alert("Asignación entregada correctamente");
+            document.getElementById("entregaForm").reset();
+        });
+
+        // Edición
+        document.getElementById("editarForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const actualizada = {
+                id: asignacion.id,
+                titulo: document.getElementById("editarTitulo").value,
+                descripcion: document.getElementById("editarDescripcion").value,
+                fecha_limite: document.getElementById("editarFecha").value
+            };
+
+            await editarAsignacion(actualizada);
+
+            alert("Asignación actualizada");
+            window.location.reload();
+        });
+        function volverAMateria() {
+            const materia = JSON.parse(localStorage.getItem("materiaSeleccionada"));
+            if (materia?.id && materia?.nombre) {
+                window.location.href = `materia.html?id=${materia.id}&nombre=${encodeURIComponent(materia.nombre)}`;
+            } else {
+                window.location.href = 'materia.html';
+            }
+        }
+    </script>
+</body>
+
+</html>
