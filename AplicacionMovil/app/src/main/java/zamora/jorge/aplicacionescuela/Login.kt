@@ -18,7 +18,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 
 class Login : AppCompatActivity() {
-    private lateinit var binding: ActivityLoginBinding
+
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,86 +33,26 @@ class Login : AppCompatActivity() {
 
         window.statusBarColor = Color.BLACK
 
-        binding = ActivityLoginBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        val iniciarSesion:Button = findViewById(R.id.btnIniciarSesion)
+        val etCorreo:EditText = findViewById(R.id.etCorreo)
+        val etContrasena:EditText = findViewById(R.id.etContrasena)
+        val tvError:TextView = findViewById(R.id.tvError)
 
-        // Maneja el registro
-        binding.tvNoTienesCuenta.setOnClickListener {
-            noTienesCuenta()
-        }
-
-        // Maneja el inicio de sesion
-        binding.btnIniciarSesion.setOnClickListener {
-            iniciarSesion()
-        }
-
-        // Instancia de servicio de autenticacion de firebase
         auth = Firebase.auth
 
-        // Instancia de elemenos visuales
-        val email: EditText =findViewById(R.id.etCorreo)
-        val password: EditText =findViewById(R.id.etContrasena)
-        val error: TextView =findViewById(R.id.tvError)
-        val buttonLogin: Button =findViewById(R.id.btnIniciarSesion)
-        val buttonRegister: TextView =findViewById(R.id.tvNoTienesCuenta)
 
-        error.visibility= View.INVISIBLE
-
-        // Manejamos el boton de registro, si hay un erro lo notifica en el TextView Error
-        buttonLogin.setOnClickListener{
-            if(email.text.isEmpty()||password.text.isEmpty()){
-                error.text="Por favor ingrese todos los campos"
-                error.visibility= View.VISIBLE
-            }else{
-                error.visibility= View.INVISIBLE
-                // Se realiza la logica de inicio de sesion
-                login(email.text.toString(),password.text.toString())
-            }
+        iniciarSesion.setOnClickListener {
+            val correo: String = etCorreo.text.toString()
+            val password: String = etContrasena.text.toString()
+            login(correo, password)
         }
 
-        // Nos envia a la actividad de Registro
-        buttonRegister.setOnClickListener{
-            val intent: Intent = Intent(this,Register::class.java)
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivity(intent)
-        }
+
+
+
+        
     }
 
-    /**
-     * Navega a la actividad de registro.
-     */
-    fun noTienesCuenta() {
-        val intent = Intent(this, Register::class.java)
-        startActivity(intent)
-    }
-
-    /**
-     * Intenta iniciar sesión con el correo electrónico y la contraseña proporcionados.
-     * Realiza validaciones básicas en los campos antes de intentar el inicio de sesión.
-     * Después del inicio de sesión exitoso, navega a la actividad CreateJoinHome.
-     */
-    fun iniciarSesion() {
-        //Obtener datos
-        val correo=binding.etCorreo
-        val contrasena=binding.etContrasena
-
-        // Validar campos vacíos
-        if ( correo.text.isEmpty() || contrasena.text.isEmpty()) {
-            Toast.makeText(this, "Ingrese todos sus datos", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // Validar correo
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(correo.text).matches()) {
-            Toast.makeText(this, "Correo inválido", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        //Cambiar actividad
-        val intent = Intent(this, CreateJoinHome::class.java)
-        intent.putExtra("correo", correo.text.toString())
-        startActivity(intent)
-    }
 
     /**
      * Se llama cuando la actividad se vuelve visible para el usuario.
@@ -138,6 +78,17 @@ class Login : AppCompatActivity() {
      */
     fun login(email: String, password: String) {
         // Autenticamos al usuario con sus credenciales
+        if ( email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Ingrese todos sus datos", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Validar correo
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(this, "Correo inválido", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -164,11 +115,12 @@ class Login : AppCompatActivity() {
      * @param user El objeto FirebaseUser del usuario autenticado.
      */
     private fun goToMain(user: FirebaseUser){
-        val intent: Intent = Intent(this,CreateJoinHome::class.java)
+        val intent: Intent = Intent(this,MainActivity::class.java)
         intent.putExtra("user",user.email)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
     }
+
 
     /**
      * Muestra u oculta el TextView de error con el mensaje proporcionado.
@@ -181,4 +133,7 @@ class Login : AppCompatActivity() {
         error.text=text
         error.visibility= if(visible) View.VISIBLE else View.INVISIBLE
     }
+
 }
+
+
