@@ -61,10 +61,12 @@
           const lista = document.getElementById("listaMaterias");
           lista.innerHTML = ""; // Limpiar antes de insertar
 
+          console.log("Materias longitud: "+materias.length);
           if (materias.length === 0) {
             lista.innerHTML = "<li>No hay materias asignadas</li>";
           } else {
             materias.forEach(materia => {
+              console.log("Materias añadida");
               const col = document.createElement("div");
               col.className = "col-12 col-md-4"; // Columna responsive
 
