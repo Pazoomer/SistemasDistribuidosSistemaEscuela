@@ -10,6 +10,8 @@ import {
   push
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
+import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyCT73pxUNL8KTa8Wa_5IPZ2zFA27S7vHw8",
   authDomain: "sistemaescuela-9bc14.firebaseapp.com",
