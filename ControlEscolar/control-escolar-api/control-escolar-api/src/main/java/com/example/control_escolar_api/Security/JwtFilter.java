@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@Component("jwtFilterBean")  // Renombrar el bean para evitar conflicto
-public class JwtFilter   implements Filter {
+@Component("jwtFilterBean")  // Este nombre será usado en SecurityConfig
+public class JwtFilter implements Filter {
 
     private final JwtUtil jwtUtil;
 
@@ -21,9 +21,12 @@ public class JwtFilter   implements Filter {
             throws IOException, ServletException {
 
         HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+
+        String uri = req.getRequestURI();
         String authHeader = req.getHeader("Authorization");
 
-        if (req.getRequestURI().equals("/api/login")) {
+        if ("/api/login".equals(uri)) {
             chain.doFilter(request, response);
             return;
         }
@@ -36,12 +39,9 @@ public class JwtFilter   implements Filter {
             }
         }
 
-        ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido o ausente");
+        res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido o ausente");
     }
 
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {}
-
-    @Override
-    public void destroy() {}
+    @Override public void init(FilterConfig filterConfig) {}
+    @Override public void destroy() {}
 }

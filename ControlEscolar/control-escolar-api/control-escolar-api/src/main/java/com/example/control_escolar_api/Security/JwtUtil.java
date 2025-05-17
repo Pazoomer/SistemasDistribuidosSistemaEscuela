@@ -2,6 +2,7 @@ package com.example.control_escolar_api.Security;
 
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;
+
 import java.util.Date;
 
 @Component
