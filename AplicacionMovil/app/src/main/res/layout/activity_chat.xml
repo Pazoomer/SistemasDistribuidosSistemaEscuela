@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:id="@+id/main_chat_container"  android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
     tools:context=".Chat">
@@ -17,8 +17,7 @@
             android:id="@+id/toolbarChat"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/material_dynamic_primary40"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+            android:background="@color/material_dynamic_primary40" app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -38,8 +37,7 @@
                         android:id="@+id/imageViewProfileToolbar"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/chuy"
-                        android:scaleType="centerCrop" />
+                        android:src="@drawable/chuy" android:scaleType="centerCrop" />
                 </androidx.cardview.widget.CardView>
 
                 <LinearLayout
@@ -89,26 +87,26 @@
         android:padding="8dp"
         android:background="#F0F0F0">
 
-    <EditText
-        android:id="@+id/editTextMessage"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:hint="Escribe un mensaje..."
-        android:inputType="textMultiLine"
-        android:background="@drawable/edittext_background_chat" android:padding="12dp"
-        android:maxLines="5"/>
+        <EditText
+            android:id="@+id/editTextMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Escribe un mensaje..."
+            android:inputType="textMultiLine"
+            android:background="@drawable/edittext_background_chat"
+            android:padding="12dp"
+            android:maxLines="5"/>
 
-    <ImageButton
-        android:id="@+id/buttonSendMessage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_menu_send"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:padding="12dp"
-        android:layout_marginStart="8dp"
-        android:contentDescription="Enviar"
-        app:tint="?attr/colorPrimary"/>
-</LinearLayout>
+        <ImageButton
+            android:id="@+id/buttonSendMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_menu_send"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="12dp"
+            android:layout_marginStart="8dp"
+            android:contentDescription="Enviar"
+            app:tint="?attr/colorPrimary"/> </LinearLayout>
 
 </RelativeLayout>
