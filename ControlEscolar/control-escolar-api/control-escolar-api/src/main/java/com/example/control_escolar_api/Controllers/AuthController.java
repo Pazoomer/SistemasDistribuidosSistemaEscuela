@@ -17,10 +17,10 @@ public class AuthController {
 
     @PostMapping("/login")
     public Map<String, String> login(@RequestBody Map<String, String> cred) {
+        System.out.println(">>> Entrando al endpoint /api/login");
         String usuario = cred.get("usuario");
         String password = cred.get("password");
 
-        // Validación básica (puedes usar una base de datos después)
         if ("admin".equals(usuario) && "admin123".equals(password)) {
             String token = jwtUtil.generarToken(usuario);
             return Map.of("token", token);

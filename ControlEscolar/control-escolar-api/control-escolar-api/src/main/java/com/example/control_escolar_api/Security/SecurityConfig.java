@@ -3,11 +3,9 @@ package com.example.control_escolar_api.Security;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -15,23 +13,21 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     @Bean
-    public FilterRegistrationBean<JwtFilter> jwtFilter(JwtFilter filter) {
-        FilterRegistrationBean<JwtFilter> reg = new FilterRegistrationBean<>();
-        reg.setFilter(filter);
-        reg.addUrlPatterns("/api/*");
-        return reg;
-    }
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            @Qualifier("jwtFilterBean") JwtFilter jwtFilter
+    ) throws Exception {
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, @Qualifier("jwtFilterBean") JwtFilter jwtFilter) throws Exception {
-        return http
-                .csrf(AbstractHttpConfigurer::disable) // Forma actualizada para deshabilitar CSRF
+        http
+                .csrf(csrf -> csrf.disable()) // 🔒 Evitar bloqueos tipo 403
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login").permitAll()  // Permitir acceso al login
-                        .anyRequest().authenticated()         // Requiere autenticación en otros endpoints
+                        .requestMatchers("/api/login").permitAll() // 🔓 Permitir login sin token
+                        .anyRequest().authenticated()              // 🔐 Lo demás protegido
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+                .sessionManagement(session -> session.disable()); // ❗ Sin sesiones
+
+        return http.build();
     }
 
     @Bean

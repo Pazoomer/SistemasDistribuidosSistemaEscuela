@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@Component("jwtFilterBean")  // Renombrar el bean para evitar conflicto
-public class JwtFilter   implements Filter {
+@Component("jwtFilterBean")
+public class JwtFilter implements Filter {
 
     private final JwtUtil jwtUtil;
 
@@ -21,26 +21,35 @@ public class JwtFilter   implements Filter {
             throws IOException, ServletException {
 
         HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+
+        String path = req.getServletPath();
+        System.out.println(">>> Solicitud a: " + path);
+
         String authHeader = req.getHeader("Authorization");
 
-        if (req.getRequestURI().equals("/api/login")) {
+        // Permitir sin token: login y errores
+        if (path.equals("/api/login") || path.startsWith("/error")) {
             chain.doFilter(request, response);
             return;
         }
 
+        // Validar token JWT
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
+
             if (jwtUtil.validarToken(token)) {
                 chain.doFilter(request, response);
                 return;
             }
         }
 
-        ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido o ausente");
+        // Si no hay token válido
+        res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido o ausente");
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {}
+    public void init(FilterConfig filterConfig) {}
 
     @Override
     public void destroy() {}
