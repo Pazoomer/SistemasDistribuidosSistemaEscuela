@@ -20,6 +20,7 @@ public class MaestroController {
         return service.obtenerTodos();
     }
 
+    @GetMapping("/sin-calificaciones")
     public List<Maestro> getMaestrosSinCalifaciones(){
         return service.obtenerSinCalificacion();
     }
