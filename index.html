@@ -79,10 +79,12 @@
     document.getElementById("cerrarSesionBtn").addEventListener("click", async () => {
       try {
         await cerrarSesionConFirebase();
-        window.location.href = "login.html";
       } catch (err) {
         console.error(err.message);
       }
+      console.error("Error al cerrar sesión");
+      localStorage.removeItem("rol");
+      window.location.href = "login.html";
     });
   </script>
 
