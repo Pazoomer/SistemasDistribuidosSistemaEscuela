@@ -36,18 +36,18 @@ app.post('/subir-calificaciones', async (req, res) => {
   try {
     for (const cal of calificaciones) {
       const {
-        curp_alumno,
+        curp,
         materia,
-        nombre_asignacion,
+        asignacion,
         calificacion,
-        id_maestro
+        idMaestro
       } = cal;
 
       // Insertar en la tabla calificaciones
       await pool.query(
         `INSERT INTO calificaciones (curp_alumno, materia, nombre_asignacion, calificacion, id_maestro) 
          VALUES (?, ?, ?, ?, ?)`,
-        [curp_alumno, materia, nombre_asignacion, calificacion, id_maestro]
+        [curp, materia, asignacion, calificacion, idMaestro]
       );
     }
 
