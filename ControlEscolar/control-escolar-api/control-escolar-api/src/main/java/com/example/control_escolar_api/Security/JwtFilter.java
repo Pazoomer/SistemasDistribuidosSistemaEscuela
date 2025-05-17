@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@Component("jwtFilterBean")  // Este nombre será usado en SecurityConfig
+@Component("jwtFilterBean")
 public class JwtFilter implements Filter {
 
     private final JwtUtil jwtUtil;
@@ -23,25 +23,34 @@ public class JwtFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
-        String uri = req.getRequestURI();
+        String path = req.getServletPath();
+        System.out.println(">>> Solicitud a: " + path);
+
         String authHeader = req.getHeader("Authorization");
 
-        if ("/api/login".equals(uri)) {
+        // Permitir sin token: login y errores
+        if (path.equals("/api/login") || path.startsWith("/error")) {
             chain.doFilter(request, response);
             return;
         }
 
+        // Validar token JWT
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
+
             if (jwtUtil.validarToken(token)) {
                 chain.doFilter(request, response);
                 return;
             }
         }
 
+        // Si no hay token válido
         res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido o ausente");
     }
 
-    @Override public void init(FilterConfig filterConfig) {}
-    @Override public void destroy() {}
+    @Override
+    public void init(FilterConfig filterConfig) {}
+
+    @Override
+    public void destroy() {}
 }

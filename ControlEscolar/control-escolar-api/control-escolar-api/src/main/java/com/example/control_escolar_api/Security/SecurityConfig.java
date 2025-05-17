@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -19,14 +18,16 @@ public class SecurityConfig {
             @Qualifier("jwtFilterBean") JwtFilter jwtFilter
     ) throws Exception {
 
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
+        http
+                .csrf(csrf -> csrf.disable()) // 🔒 Evitar bloqueos tipo 403
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/login").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/login").permitAll() // 🔓 Permitir login sin token
+                        .anyRequest().authenticated()              // 🔐 Lo demás protegido
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+                .sessionManagement(session -> session.disable()); // ❗ Sin sesiones
+
+        return http.build();
     }
 
     @Bean
