@@ -15,7 +15,7 @@
 
   <div class="container mt-5">
     <h2>Materias</h2>
-    <div id="listaMaterias" class="row"></div>
+    <div id="listaMaterias" class="row gy-3"></div>
     <button id="cerrarSesionBtn" class="btn btn-danger">Cerrar sesión</button>
   </div>
 
@@ -66,15 +66,25 @@
           } else {
             materias.forEach(materia => {
               const col = document.createElement("div");
-              col.className = "col-12 col-md-4";
+              col.className = "col-12 col-md-4"; // Columna responsive
 
-              col.innerHTML =
-                '<div class="card h-100 shadow-sm">' +
-                '<div class="card-body">' +
-                '<h5 class="card-title">' + materia.nombre + '</h5>' +
-                '<p class="card-text"><strong>ID:</strong> ' + materia.id + '</p>' +
-                '</div>' +
-                '</div>';
+              const card = document.createElement("div");
+              card.className = "card h-100 shadow-sm";
+
+              const cardBody = document.createElement("div");
+              cardBody.className = "card-body";
+
+              const titulo = document.createElement("h5");
+              titulo.className = "card-title";
+              titulo.textContent = materia.nombre;
+
+              const texto = document.createElement("p");
+              texto.className = "card-text";
+
+              cardBody.appendChild(titulo);
+              cardBody.appendChild(texto);
+              card.appendChild(cardBody);
+              col.appendChild(card);
               lista.appendChild(col);
             });
           }
