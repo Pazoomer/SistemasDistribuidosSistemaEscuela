@@ -102,11 +102,6 @@ export async function cargarMateriasPorMaestro(idMaestro) {
 
     if (snapshot.exists()) {
       const materias = snapshot.val();
-      console.log("ID buscado:", idMaestro);
-      console.log("Todas las materias:", materias);
-      Object.entries(materias).forEach(([id, materia]) => {
-        console.log(`Materia ID: ${id}, id_maestro: ${materia.id_maestro}`);
-      });
       const materiasDelMaestro = Object.entries(materias)
         .filter(([_, materia]) => (materia.id_maestro || "") === idMaestro)
         .map(([id, materia]) => ({ id, ...materia }));
