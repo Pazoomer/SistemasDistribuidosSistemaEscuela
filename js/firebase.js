@@ -7,6 +7,7 @@ import {
   set,
   get,
   child,
+  update,
   push
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
@@ -29,7 +30,6 @@ const auth = getAuth(app);
 console.log("Firebase inicializado correctamente");
 
 export async function obtenerEntregasPorAsignacion(idAsignacion) {
-  const db = getDatabase();
   const dbRef = ref(db);
 
   try {
@@ -65,7 +65,6 @@ export async function obtenerEntregasPorAsignacion(idAsignacion) {
 }
 
 export async function obtenerAlumnosPorMateria(idMateria) {
-  const db = getDatabase();
   const dbRef = ref(db);
 
   try {
@@ -96,7 +95,6 @@ export async function obtenerAlumnosPorMateria(idMateria) {
 }
 
 export async function entregarAsignacion(entrega) {
-  const db = getDatabase();
   const nuevaEntregaRef = push(ref(db, 'asignaciones_entregadas'));
 
   try {
@@ -116,7 +114,6 @@ export async function entregarAsignacion(entrega) {
 }
 
 export async function calificarAsignacion(idEntrega, calificacion) {
-  const db = getDatabase();
   const entregaRef = ref(db, `asignaciones_entregadas/${idEntrega}`);
 
   try {
@@ -318,16 +315,12 @@ export async function cargarAsignacionesPorMateria(idMateria) {
 
 // Este método es para guardar una nueva asignación (si no lo tienes)
 export async function crearAsignacion(asignacion) {
-  const db = getDatabase();
   const nuevaRef = push(ref(db, "asignaciones"));
   await set(nuevaRef, asignacion);
 }
 
 //Obtiene todas las calificaciones de todas las materias de un maestro
-
 export async function cargarMateriasPorAlumno(idAlumno) {
-  const db = getDatabase();
-
   try {
     // 1. Obtener relaciones materias_alumnos
     const relSnap = await get(ref(db, "materias_alumnos"));
@@ -443,7 +436,6 @@ export async function agregarDatosEjemplo() {
 }
 
 export async function agregarMaestro(datos) {
-  const db = getDatabase();
   try {
     const nuevoRef = ref(db, "maestros");
     await push(nuevoRef, datos);
