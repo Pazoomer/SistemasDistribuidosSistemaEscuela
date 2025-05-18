@@ -34,7 +34,7 @@ export async function obtenerEntregasPorAsignacion(idAsignacion) {
 
   try {
     // Obtener entregas
-    const snapshotEntregas = await get(child(dbRef, 'asignaciones_entregadas'));
+    const snapshotEntregas = await get(child(dbRef, 'asignaciones_entregas'));
     if (!snapshotEntregas.exists()) return [];
 
     const entregas = snapshotEntregas.val();
