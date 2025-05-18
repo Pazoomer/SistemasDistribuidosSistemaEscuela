@@ -103,12 +103,7 @@
             window.location.reload();
         });
         function volverAMateria() {
-            const materia = JSON.parse(localStorage.getItem("materiaSeleccionada"));
-            if (materia?.id && materia?.nombre) {
-                window.location.href = `materia.html?id=${materia.id}&nombre=${encodeURIComponent(materia.nombre)}`;
-            } else {
-                window.location.href = 'materia.html';
-            }
+            window.location.href = 'materia.html';
         }
     </script>
 </body>

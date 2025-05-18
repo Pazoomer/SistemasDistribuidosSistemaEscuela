@@ -28,6 +28,40 @@ const auth = getAuth(app);
 
 console.log("Firebase inicializado correctamente");
 
+export async function entregarAsignacion(entrega) {
+  const db = getDatabase();
+  const nuevaEntregaRef = push(ref(db, 'asignaciones_entregadas'));
+
+  try {
+    await set(nuevaEntregaRef, {
+      id_asignacion: entrega.id_asignacion,
+      id_alumno: entrega.id_alumno,
+      archivo_adjunto: entrega.archivo_adjunto,
+      fecha_entrega: entrega.fecha_entrega,
+      estado: entrega.estado
+    });
+    console.log("Entrega registrada correctamente");
+  } catch (error) {
+    console.error("Error al registrar la entrega:", error);
+    throw error;
+  }
+}
+
+export async function editarAsignacion(asignacion) {
+  const dbRef = ref(getDatabase());
+  try {
+    await set(child(dbRef, `asignaciones/${asignacion.id}`), {
+      titulo: asignacion.titulo,
+      descripcion: asignacion.descripcion,
+      fecha_limite: asignacion.fecha_limite
+    });
+    console.log("Asignación editada correctamente");
+  } catch (error) {
+    console.error("Error al editar la asignación:", error);
+    throw error;
+  }
+}
+
 export async function obtenerCalificacionesPorMaestro(idMaestro) {
   const dbRef = ref(getDatabase());
 
