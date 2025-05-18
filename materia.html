@@ -42,6 +42,9 @@
     const materia = JSON.parse(localStorage.getItem("materiaSeleccionada"));
     const usuario = JSON.parse(localStorage.getItem("usuarioActual"));
 
+    console.log("Usuario seleccionada:", usuario);
+    console.log("Materia seleccionada:", materia);
+
     document.getElementById("nombreMateria").textContent = `Asignaciones de ${materia.nombre}`;
 
     if (usuario.rol === "maestro") {
@@ -118,13 +121,13 @@
     });
   </script>
   <script>
-  const toggleBtn = document.getElementById("toggleFormBtn");
-  const formDiv = document.getElementById("formNuevaAsignacion");
+    const toggleBtn = document.getElementById("toggleFormBtn");
+    const formDiv = document.getElementById("formNuevaAsignacion");
 
-  toggleBtn.addEventListener("click", () => {
-    formDiv.hidden = !formDiv.hidden;
-  });
-</script>
+    toggleBtn.addEventListener("click", () => {
+      formDiv.hidden = !formDiv.hidden;
+    });
+  </script>
 </body>
 
 </html>
