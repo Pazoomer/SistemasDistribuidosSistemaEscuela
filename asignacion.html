@@ -126,6 +126,9 @@
         async function mostrarEntregas(asignacionId) {
             try {
                 const entregas = await obtenerEntregasPorAsignacion(asignacionId);
+
+                console.log("Entregas:", entregas);
+
                 const contenedor = document.getElementById("entregasContainer");
                 contenedor.innerHTML = "";
 
