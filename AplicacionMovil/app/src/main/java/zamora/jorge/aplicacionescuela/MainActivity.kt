@@ -1,43 +1,91 @@
 package zamora.jorge.aplicacionescuela
 
-import android.content.Context
+
 import android.content.Intent
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.ListView
+import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import zamora.jorge.aplicacionescuela.data.Maestro
+import com.google.firebase.database.database
+import zamora.jorge.aplicacionescuela.data.Alumno
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var tvNombre: TextView
+    private lateinit var tvCurp: TextView
+    private lateinit var btnMaterias: TextView
+    private lateinit var btnMensajes: TextView
     private lateinit var database: DatabaseReference
+    private lateinit var alumnosRef: DatabaseReference
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+
+        tvNombre = findViewById(R.id.tvNombre)
+        tvCurp = findViewById(R.id.tvCurp)
+        btnMaterias = findViewById(R.id.btnMaterias)
+        btnMensajes = findViewById(R.id.btnMensajes)
+        database = Firebase.database.reference
+        alumnosRef = database.child("alumnos")
+
+        // Obtener el usuario (tutor) del Intent
+        val user = intent.getParcelableExtra<FirebaseUser>("user")
+
+        // Verificar si se recibió el usuario
+        if (user != null) {
+            // Ahora obtener la información del alumno asociado a este tutor
+            obtenerInformacionAlumno(user.uid) // Usar el uid del tutor para buscar al alumno
+
+        } else {
+            // Manejar el caso en que no se recibió el usuario
+            tvNombre.text = "Error: No se recibió información del tutor."
+            tvCurp.text = ""
         }
 
+        btnMensajes.setOnClickListener {
+            val intent = Intent(this, Mensajes::class.java)
+            startActivity(intent)
+        }
+    }
+
+    private fun obtenerInformacionAlumno(tutorId: String) {
+        alumnosRef.orderByChild("id_tutor").equalTo(tutorId)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.hasChildren()) {
+                        for (childSnapshot in snapshot.children) {
+                            val alumno = childSnapshot.getValue(Alumno::class.java)
+                            val alumnoId = childSnapshot.key  // <- AQUÍ
+                            alumno?.let {
+                                tvNombre.text = "Nombre Alumno: ${it.nombre_completo}"
+                                tvCurp.text = "CURP: ${it.curp}"
+
+                                // Configura el botón de materias con el ID correcto
+                                btnMaterias.setOnClickListener {
+                                    val intent = Intent(this@MainActivity, Materias::class.java)
+                                    intent.putExtra("alumnoId", alumnoId) // <- CORRECTO
+                                    startActivity(intent)
+                                }
+                                return
+                            }
+                        }
+                    } else {
+                        tvNombre.text = "No se encontró alumno asociado a este tutor."
+                        tvCurp.text = ""
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    tvNombre.text = "Error al buscar alumno: ${error.message}"
+                    tvCurp.text = ""
+                }
+            })
     }
 }

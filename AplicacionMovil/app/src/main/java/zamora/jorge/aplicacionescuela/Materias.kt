@@ -1,27 +1,32 @@
 package zamora.jorge.aplicacionescuela
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
+import android.widget.ArrayAdapter
+import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import zamora.jorge.aplicacionescuela.data.Maestro
+import com.google.firebase.database.*
+import zamora.jorge.aplicacionescuela.data.Materia
 
 class Materias : AppCompatActivity() {
+
+    private lateinit var lvMaterias: ListView
+    private lateinit var tvTituloMaterias: TextView
     private lateinit var database: DatabaseReference
+    private lateinit var alumnosRef: DatabaseReference
+    private lateinit var materiasRef: DatabaseReference
+    private var alumnoId: String? = null  // variable global para alumnoId
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -32,53 +37,121 @@ class Materias : AppCompatActivity() {
             insets
         }
 
-        val listView = findViewById<ListView>(R.id.lvMaterias)
+        // Inicializar Firebase
+        database = com.google.firebase.Firebase.database.reference
+        alumnosRef = database.child("alumnos")
+        materiasRef = database.child("materias")
 
-        database = FirebaseDatabase.getInstance().reference.child("maestros")
-        cargarMaestros { maestros ->
-            val adapter = MaestroAdapter(this, maestros.toMutableList())
-            listView.adapter = adapter
+        // Obtener alumnoId desde intent y referencias UI
+        alumnoId = intent.getStringExtra("alumnoId")
+        lvMaterias = findViewById(R.id.lvMaterias)
+        tvTituloMaterias = findViewById(R.id.tvTituloMateria)
+
+        if (alumnoId != null) {
+            obtenerMateriasDelAlumno(alumnoId!!)
+        } else {
+            tvTituloMaterias.text = "Error: Alumno ID no proporcionado"
+            Log.e("MateriasActivity", "Alumno ID es nullo")
         }
     }
 
-    fun cargarMaestros(callback: (List<Maestro>) -> Unit) {
-        database.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val listaMaestros = mutableListOf<Maestro>()
-                for (maestroSnap in snapshot.children) {
-                    val maestro = maestroSnap.getValue(Maestro::class.java)
-                    if (maestro != null) {
-                        listaMaestros.add(maestro)
+    private fun obtenerMateriasDelAlumno(alumnoId: String) {
+        // Obtener los IDs de materias que tiene el alumno
+        alumnosRef.child(alumnoId).child("materias")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val materiaIds = mutableListOf<String>()
+                    for (materiaIdSnapshot in snapshot.children) {
+                        materiaIdSnapshot.key?.let { materiaIds.add(it) }
+                    }
+                    Log.d("MateriasActivity", "materiaIds: $materiaIds")
+                    if (materiaIds.isNotEmpty()) {
+                        obtenerDetallesMaterias(materiaIds)
+                    } else {
+                        tvTituloMaterias.text = "El alumno no tiene materias asignadas"
+                        lvMaterias.adapter = ArrayAdapter(
+                            this@Materias,
+                            android.R.layout.simple_list_item_1,
+                            emptyList<String>()
+                        )
                     }
                 }
-                callback(listaMaestros)
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("MateriasActivity", "Error getting alumno materias: ${error.message}")
+                    tvTituloMaterias.text = "Error al obtener materias: ${error.message}"
+                }
+            })
+    }
+
+    private fun obtenerDetallesMaterias(materiaIds: List<String>) {
+        materiasRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val materias = mutableListOf<Materia>()
+                for (materiaId in materiaIds) {
+                    if (snapshot.hasChild(materiaId)) {
+                        val materiaSnapshot = snapshot.child(materiaId)
+                        val materia = materiaSnapshot.getValue(Materia::class.java)
+                        materia?.let {
+                            val materiaConId = it.copy(id = materiaId)
+                            materias.add(materiaConId)
+                        }
+                    } else {
+                        Log.e("MateriasActivity", "Materia ID: $materiaId no se encuentra en la base de datos")
+                    }
+                }
+                if (materias.isNotEmpty()) {
+                    val materiaAdapter = MateriaAdapter(this@Materias, materias, alumnoId)
+                    lvMaterias.adapter = materiaAdapter
+                    tvTituloMaterias.text = "Materias del alumno"
+                } else {
+                    tvTituloMaterias.text = "No se encontraron materias"
+                    lvMaterias.adapter = ArrayAdapter(
+                        this@Materias,
+                        android.R.layout.simple_list_item_1,
+                        emptyList<String>()
+                    )
+                }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e("Firebase", "Error al cargar maestros", error.toException())
-                callback(emptyList())
+                Log.e("MateriasActivity", "Error obteniendo materiales: ${error.message}")
+                tvTituloMaterias.text = "Error al obtener materias: ${error.message}"
             }
         })
     }
 
-    class MaestroAdapter(private val context: Context,
-                         private var data: MutableList<Maestro>) : BaseAdapter() {
-
-        override fun getCount(): Int = data.size
-
-        override fun getItem(position: Int): Any = data[position]
-
-        override fun getItemId(position: Int): Long = position.toLong()
+    internal class MateriaAdapter(
+        context: Context,
+        materias: List<Materia>,
+        private val alumnoId: String?
+    ) : ArrayAdapter<Materia>(context, 0, materias) {
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_maestro, parent, false)
+            val materia = getItem(position)!!
 
-            view.findViewById<TextView>(R.id.nombre_completo).text = data[position].nombre_completo
-            view.findViewById<TextView>(R.id.curp).text = data[position].curp
-            view.findViewById<TextView>(R.id.rfc).text = data[position].rfc
-            view.findViewById<TextView>(R.id.correo).text = data[position].correo
-            view.findViewById<TextView>(R.id.telefono).text = data[position].telefono
-            view.findViewById<TextView>(R.id.direccion).text = data[position].direccion
+            val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_materia, parent, false)
+
+            val tvNombreMateria: TextView = view.findViewById(R.id.tvNombreMateria)
+            val ivFondoMateria: ImageView = view.findViewById(R.id.ivFondoMateria)
+
+            tvNombreMateria.text = materia.nombre
+
+            tvNombreMateria.setOnClickListener {
+                val intent = Intent(context, DetallesMateria::class.java)
+                intent.putExtra("materia", materia)
+                alumnoId?.let { id -> intent.putExtra("alumnoId", id) }
+                context.startActivity(intent)
+            }
+
+            // Cambiar background según materia
+            val backgroundRes = when (materia.nombre) {
+                "Innovacion" -> R.drawable.rounded_rectangle_background
+                "Programación Web" -> R.drawable.rounded_rectangle_background
+                "Aplicaciones Web" -> R.drawable.rounded_rectangle_background
+                else -> R.drawable.rounded_rectangle_background
+            }
+            ivFondoMateria.setBackgroundResource(backgroundRes)
 
             return view
         }
