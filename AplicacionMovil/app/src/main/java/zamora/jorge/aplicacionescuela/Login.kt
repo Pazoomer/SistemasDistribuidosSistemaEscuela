@@ -46,13 +46,8 @@ class Login : AppCompatActivity() {
             val password: String = etContrasena.text.toString()
             login(correo, password)
         }
-
-
-
-
         
     }
-
 
     /**
      * Se llama cuando la actividad se vuelve visible para el usuario.
@@ -116,7 +111,7 @@ class Login : AppCompatActivity() {
      */
     private fun goToMain(user: FirebaseUser){
         val intent: Intent = Intent(this,MainActivity::class.java)
-        intent.putExtra("user",user.email)
+        intent.putExtra("user",user)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
     }

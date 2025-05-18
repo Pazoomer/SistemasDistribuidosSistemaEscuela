@@ -56,17 +56,17 @@
 
 
             <TextView
-                android:id="@+id/tvSemestre"
+                android:id="@+id/tvCurp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Semestre: Sexto"
+                android:text="CURP: TORL010101HSONRS09"
                 android:textSize="14sp"
                 android:textColor="#757575" />
         </LinearLayout>
 
     </LinearLayout>
         <Button
-            android:id="@+id/btnMateias"
+            android:id="@+id/btnMaterias"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="100dp"

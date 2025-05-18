@@ -1,4 +1,9 @@
-package zamora.jorge.aplicacionescuela.data;
+package zamora.jorge.aplicacionescuela.data
 
-public class Materia {
-}
+import java.io.Serializable
+
+data class Materia(
+    val id: String = "",
+    val id_maestro: String? = null,
+    val nombre: String? = null
+) : Serializable
