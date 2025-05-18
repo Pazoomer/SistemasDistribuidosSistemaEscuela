@@ -23,6 +23,13 @@
                 <button class="btn btn-success">Entregar</button>
             </form>
         </div>
+        <div id="formEntrega" style="display:none" class="mt-4">
+            <h4>Entregar asignación</h4>
+            <form id="entregaForm">
+                <input type="url" id="archivoAdjunto" class="form-control mb-2" placeholder="Link al archivo" />
+                <button class="btn btn-success">Entregar</button>
+            </form>
+        </div>
 
         <!-- Solo maestros -->
         <div id="formEditar" style="display:none" class="mt-4">
@@ -34,6 +41,11 @@
                 <button class="btn btn-warning">Guardar cambios</button>
             </form>
         </div>
+        <!-- Lista de entregas -->
+        <div id="listaEntregas" style="display:none" class="mt-4">
+            <h4>Entregas realizadas</h4>
+            <ul id="entregasContainer" class="list-group"></ul>
+        </div>
 
         <!-- Botón volver -->
         <div class="mt-4">
@@ -44,7 +56,9 @@
     <script type="module">
         import {
             editarAsignacion,
-            entregarAsignacion
+            entregarAsignacion,
+            obtenerEntregasPorAsignacion,
+            calificarAsignacion
         } from './js/firebase.js';
 
         const materia = JSON.parse(localStorage.getItem("materiaSeleccionada"));
@@ -62,12 +76,15 @@
         // Mostrar formularios según rol
         if (usuario.rol === "estudiante") {
             document.getElementById("formEntrega").style.display = "block";
+            document.getElementById("listaEntregas").style.display = "none";
         } else if (usuario.rol === "maestro") {
             document.getElementById("formEditar").style.display = "block";
+            document.getElementById("listaEntregas").style.display = "block";
             // Prefill datos
             document.getElementById("editarTitulo").value = asignacion.titulo;
             document.getElementById("editarDescripcion").value = asignacion.descripcion;
             document.getElementById("editarFecha").value = asignacion.fecha_limite;
+            mostrarEntregas(asignacion.id);
         }
 
         // Entrega
@@ -96,13 +113,79 @@
                 id: asignacion.id,
                 titulo: document.getElementById("editarTitulo").value,
                 descripcion: document.getElementById("editarDescripcion").value,
-                fecha_limite: document.getElementById("editarFecha").value
+                fecha_limite: document.getElementById("editarFecha").value,
+                id_materia: asignacion.id_materia
             };
 
             await editarAsignacion(actualizada);
 
             alert("Asignación actualizada");
             window.location.reload();
+        });
+
+        async function mostrarEntregas(asignacionId) {
+            try {
+                const entregas = await obtenerEntregasPorAsignacion(asignacionId);
+                const contenedor = document.getElementById("entregasContainer");
+                contenedor.innerHTML = "";
+
+                if (entregas.length === 0) return;
+
+                entregas.forEach(entrega => {
+                    const li = document.createElement("li");
+                    li.className = "list-group-item";
+                    li.innerHTML = `
+        <strong>Alumno:</strong> ${entrega.nombre_completo}<br>
+        <strong>Id:</strong> ${entrega.id_alumno}<br>
+        <strong>Archivo:</strong> <a href="${entrega.archivo_adjunto}" target="_blank">Ver</a><br>
+        <strong>Fecha:</strong> ${entrega.fecha_entrega}<br>
+        <strong>Estado:</strong> ${entrega.estado}<br>
+        <strong>Calificación:</strong> ${entrega.calificacion ?? "Sin calificar"}
+        <br><button class="btn btn-sm btn-outline-primary mt-2" data-id="${entrega.id}">Calificar</button>
+      `;
+                    contenedor.appendChild(li);
+                });
+
+                document.getElementById("listaEntregas").style.display = "block";
+
+                // Asignar evento a cada botón de calificación
+                document.querySelectorAll("button[data-id]").forEach(btn => {
+                    btn.addEventListener("click", async () => {
+                        const id = btn.getAttribute("data-id");
+                        const nota = prompt("Ingresa la calificación (número):");
+                        if (nota !== null) {
+                            await calificarAsignacion(id, parseFloat(nota));
+                            alert("Calificación guardada");
+                            mostrarEntregas(asignacionId); // Recargar lista
+                        }
+                    });
+                });
+
+            } catch (error) {
+                console.error("Error mostrando entregas:", error);
+            }
+        }
+
+        document.getElementById("entregaForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const link = document.getElementById("archivoAdjunto").value; // Aquí está el texto, que es un link obligatorio
+            const hoy = new Date().toISOString().split("T")[0];
+
+            if (!link) {
+                alert("Por favor ingresa el link del archivo");
+                return;
+            }
+
+            await entregarAsignacion({
+                id_asignacion: asignacion.id,
+                id_alumno: usuario.id,
+                archivo_adjunto: link,  // El "texto" es el link
+                fecha_entrega: hoy
+            });
+
+            alert("Asignación entregada correctamente");
+            document.getElementById("entregaForm").reset();
         });
     </script>
 </body>

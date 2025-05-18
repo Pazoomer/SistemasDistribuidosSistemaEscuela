@@ -28,6 +28,73 @@ const auth = getAuth(app);
 
 console.log("Firebase inicializado correctamente");
 
+export async function obtenerEntregasPorAsignacion(idAsignacion) {
+  const db = getDatabase();
+  const dbRef = ref(db);
+
+  try {
+    // Obtener entregas
+    const snapshotEntregas = await get(child(dbRef, 'asignaciones_entregadas'));
+    if (!snapshotEntregas.exists()) return [];
+
+    const entregas = snapshotEntregas.val();
+
+    // Filtrar entregas por la asignación
+    const entregasFiltradas = Object.entries(entregas)
+      .filter(([_, entrega]) => entrega.id_asignacion === idAsignacion)
+      .map(([id, entrega]) => ({ id, ...entrega }));
+
+    // Obtener todos los alumnos para hacer match
+    const snapshotAlumnos = await get(child(dbRef, 'alumnos'));
+    const alumnos = snapshotAlumnos.exists() ? snapshotAlumnos.val() : {};
+
+    // Agregar nombre del alumno a cada entrega
+    const entregasConNombre = entregasFiltradas.map(entrega => {
+      const alumno = alumnos[entrega.id_alumno];
+      return {
+        ...entrega,
+        nombre_completo: alumno ? alumno.nombre_completo : "Desconocido"
+      };
+    });
+
+    return entregasConNombre;
+  } catch (error) {
+    console.error("Error al obtener entregas con nombre de alumno:", error);
+    throw error;
+  }
+}
+
+export async function obtenerAlumnosPorMateria(idMateria) {
+  const db = getDatabase();
+  const dbRef = ref(db);
+
+  try {
+    // Obtener todas las relaciones materia-alumno
+    const relacionesSnap = await get(child(dbRef, 'materias_alumnos'));
+    if (!relacionesSnap.exists()) return [];
+
+    const relaciones = relacionesSnap.val();
+
+    // Filtrar solo los alumnos de la materia dada
+    const idsAlumnos = Object.values(relaciones)
+      .filter(rel => rel.id_materia === idMateria)
+      .map(rel => rel.id_alumno);
+
+    const alumnosSnap = await get(child(dbRef, 'alumnos'));
+    if (!alumnosSnap.exists()) return [];
+
+    const alumnos = alumnosSnap.val();
+
+    // Devolver datos completos de los alumnos de la materia
+    const alumnosMateria = idsAlumnos.map(id => ({ id, ...alumnos[id] })).filter(a => a);
+    return alumnosMateria;
+
+  } catch (error) {
+    console.error("Error al obtener alumnos por materia:", error);
+    throw error;
+  }
+}
+
 export async function entregarAsignacion(entrega) {
   const db = getDatabase();
   const nuevaEntregaRef = push(ref(db, 'asignaciones_entregadas'));
@@ -38,11 +105,27 @@ export async function entregarAsignacion(entrega) {
       id_alumno: entrega.id_alumno,
       archivo_adjunto: entrega.archivo_adjunto,
       fecha_entrega: entrega.fecha_entrega,
-      estado: entrega.estado
+      estado: "entregado",
+      calificacion: null
     });
     console.log("Entrega registrada correctamente");
   } catch (error) {
     console.error("Error al registrar la entrega:", error);
+    throw error;
+  }
+}
+
+export async function calificarAsignacion(idEntrega, calificacion) {
+  const db = getDatabase();
+  const entregaRef = ref(db, `asignaciones_entregadas/${idEntrega}`);
+
+  try {
+    await update(entregaRef, {
+      calificacion: calificacion
+    });
+    console.log("Calificación asignada correctamente");
+  } catch (error) {
+    console.error("Error al calificar la entrega:", error);
     throw error;
   }
 }
@@ -53,7 +136,8 @@ export async function editarAsignacion(asignacion) {
     await set(child(dbRef, `asignaciones/${asignacion.id}`), {
       titulo: asignacion.titulo,
       descripcion: asignacion.descripcion,
-      fecha_limite: asignacion.fecha_limite
+      fecha_limite: asignacion.fecha_limite,
+      id_materia: asignacion.id_materia
     });
     console.log("Asignación editada correctamente");
   } catch (error) {
