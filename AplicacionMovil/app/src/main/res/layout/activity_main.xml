@@ -75,6 +75,17 @@
             android:textColor="#FFFFFF"
             android:backgroundTint="#F44336"
             android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/btnMensajes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Mensajes "
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#F44336"
+            android:layout_marginBottom="16dp" />
     </LinearLayout>
 
 </LinearLayout>

@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvNombre: TextView
     private lateinit var tvCurp: TextView
     private lateinit var btnMaterias: TextView
+    private lateinit var btnMensajes: TextView
     private lateinit var database: DatabaseReference
     private lateinit var alumnosRef: DatabaseReference
 
@@ -30,6 +31,7 @@ class MainActivity : AppCompatActivity() {
         tvNombre = findViewById(R.id.tvNombre)
         tvCurp = findViewById(R.id.tvCurp)
         btnMaterias = findViewById(R.id.btnMaterias)
+        btnMensajes = findViewById(R.id.btnMensajes)
         database = Firebase.database.reference
         alumnosRef = database.child("alumnos")
 
@@ -45,6 +47,11 @@ class MainActivity : AppCompatActivity() {
             // Manejar el caso en que no se recibió el usuario
             tvNombre.text = "Error: No se recibió información del tutor."
             tvCurp.text = ""
+        }
+
+        btnMensajes.setOnClickListener {
+            val intent = Intent(this, Mensajes::class.java)
+            startActivity(intent)
         }
     }
 
