@@ -95,7 +95,7 @@ export async function obtenerAlumnosPorMateria(idMateria) {
 }
 
 export async function entregarAsignacion(entrega) {
-  const nuevaEntregaRef = push(ref(db, 'asignaciones_entregadas'));
+  const nuevaEntregaRef = push(ref(db, 'asignaciones_entregas'));
 
   try {
     await set(nuevaEntregaRef, {
