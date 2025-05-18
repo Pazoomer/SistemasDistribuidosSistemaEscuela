@@ -95,7 +95,7 @@
         card.addEventListener("click", () => {
           localStorage.setItem("asignacionSeleccionada", JSON.stringify(asignacion));
           localStorage.setItem("materiaSeleccionada", JSON.stringify(materia));
-          localStorage.setItem("usuarioActual", JSON.stringify({ usuario }));
+          localStorage.setItem("usuarioActual", JSON.stringify(usuario));
           window.location.href = "asignacion.html";
         });
       });
