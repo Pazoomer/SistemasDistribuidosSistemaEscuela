@@ -54,16 +54,49 @@
     if (rol === "estudiante") {
       cargarMateriasPorAlumno(idUsuario)
         .then(materias => {
+          console.log("Materias filtradas:", materias);
           const lista = document.getElementById("listaMaterias");
           lista.innerHTML = ""; // Limpiar antes de insertar
 
+          console.log("Materias longitud: " + materias.length);
           if (materias.length === 0) {
             lista.innerHTML = "<li>No hay materias asignadas</li>";
           } else {
             materias.forEach(materia => {
-              const li = document.createElement("li");
-              li.textContent = materia.nombre;
-              lista.appendChild(li);
+              const col = document.createElement("div");
+              col.className = "col-12 col-md-4";
+
+              const card = document.createElement("div");
+              card.className = "card h-100 shadow-sm text-white";
+              card.style.backgroundImage = `url('${fondos[Math.floor(Math.random() * fondos.length)]}')`;
+              card.style.backgroundSize = "cover";
+              card.style.backgroundPosition = "center";
+              card.style.cursor = "pointer";
+
+              const overlay = document.createElement("div");
+              overlay.className = "card-body";
+              overlay.style.background = "rgba(0, 0, 0, 0.6)";
+              overlay.style.borderRadius = "0.5rem";
+
+              const titulo = document.createElement("h5");
+              titulo.className = "card-title";
+              titulo.textContent = materia.nombre;
+
+              overlay.appendChild(titulo);
+              card.appendChild(overlay);
+              col.appendChild(card);
+              lista.appendChild(col);
+
+              // Click para ir a materia.html y guardar datos
+              card.addEventListener("click", () => {
+                localStorage.setItem("materiaSeleccionada", JSON.stringify(materia));
+                localStorage.setItem("usuarioActual", JSON.stringify({
+                  id: idUsuario,
+                  correo: correoUsuario,
+                  rol: rol
+                }));
+                window.location.href = "materia.html";
+              });
             });
           }
         })
