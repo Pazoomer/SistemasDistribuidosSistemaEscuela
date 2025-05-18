@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -21,8 +22,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvCurp: TextView
     private lateinit var btnMaterias: TextView
     private lateinit var btnMensajes: TextView
+    private lateinit var btnCerrarSesion: TextView
     private lateinit var database: DatabaseReference
     private lateinit var alumnosRef: DatabaseReference
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,8 +35,11 @@ class MainActivity : AppCompatActivity() {
         tvCurp = findViewById(R.id.tvCurp)
         btnMaterias = findViewById(R.id.btnMaterias)
         btnMensajes = findViewById(R.id.btnMensajes)
+        btnCerrarSesion = findViewById(R.id.btnCerrarSesion)
+
         database = Firebase.database.reference
         alumnosRef = database.child("alumnos")
+        auth = FirebaseAuth.getInstance()
 
         // Obtener el usuario (tutor) del Intent
         val user = intent.getParcelableExtra<FirebaseUser>("user")
@@ -53,6 +59,22 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, Mensajes::class.java)
             startActivity(intent)
         }
+
+        btnCerrarSesion.setOnClickListener {
+            cerrarSesion()
+        }
+    }
+
+
+    private fun cerrarSesion() {
+        auth.signOut() // Cierra la sesión en Firebase Authentication
+
+        val intent = Intent(this, Login::class.java)
+
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+        startActivity(intent)
+        finish() // Cierra MainActivity
     }
 
     private fun obtenerInformacionAlumno(tutorId: String) {
