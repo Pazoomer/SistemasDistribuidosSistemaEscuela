@@ -37,7 +37,7 @@
 
         <!-- Botón volver -->
         <div class="mt-4">
-            <button class="btn btn-secondary" onclick="volverAMateria()">Volver a la materia</button>
+            <a href="materia.html" class="btn btn-secondary">Volver a la materia</a>
         </div>
     </div>
 
@@ -52,6 +52,8 @@
         const usuario = JSON.parse(localStorage.getItem("usuarioActual"));
 
         console.log("Asignacion seleccionada:", asignacion);
+        console.log("Usuario seleccionada:", usuario);
+        console.log("Materia seleccionada:", materia);
         // Mostrar datos
         document.getElementById("tituloAsignacion").textContent = asignacion.titulo;
         document.getElementById("descripcionAsignacion").textContent = asignacion.descripcion;
@@ -102,9 +104,6 @@
             alert("Asignación actualizada");
             window.location.reload();
         });
-        function volverAMateria() {
-            window.location.href = 'materia.html';
-        }
     </script>
 </body>
 
