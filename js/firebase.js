@@ -114,7 +114,7 @@ export async function entregarAsignacion(entrega) {
 }
 
 export async function calificarAsignacion(idEntrega, calificacion) {
-  const entregaRef = ref(db, `asignaciones_entregadas/${idEntrega}`);
+  const entregaRef = ref(db, `asignaciones_entregas/${idEntrega}`);
 
   try {
     await update(entregaRef, {
