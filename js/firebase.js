@@ -95,20 +95,46 @@ export async function obtenerAlumnosPorMateria(idMateria) {
 }
 
 export async function entregarAsignacion(entrega) {
-  const nuevaEntregaRef = push(ref(db, 'asignaciones_entregas'));
+  const dbRef = ref(db);
 
   try {
-    await set(nuevaEntregaRef, {
+    // Obtener todas las entregas
+    const snapshot = await get(child(dbRef, 'asignaciones_entregas'));
+    const entregas = snapshot.exists() ? snapshot.val() : {};
+
+    // Buscar si ya existe una entrega del mismo alumno para la misma asignación
+    let entregaExistenteId = null;
+
+    for (const [id, e] of Object.entries(entregas)) {
+      if (e.id_asignacion === entrega.id_asignacion && e.id_alumno === entrega.id_alumno) {
+        entregaExistenteId = id;
+        break;
+      }
+    }
+
+    // Datos de la entrega
+    const datosEntrega = {
       id_asignacion: entrega.id_asignacion,
       id_alumno: entrega.id_alumno,
       archivo_adjunto: entrega.archivo_adjunto,
       fecha_entrega: entrega.fecha_entrega,
       estado: "entregado",
       calificacion: null
-    });
-    console.log("Entrega registrada correctamente");
+    };
+
+    if (entregaExistenteId) {
+      // Actualizar entrega existente
+      await set(ref(db, `asignaciones_entregas/${entregaExistenteId}`), datosEntrega);
+      console.log("Entrega actualizada correctamente");
+    } else {
+      // Crear nueva entrega
+      const nuevaEntregaRef = push(ref(db, 'asignaciones_entregas'));
+      await set(nuevaEntregaRef, datosEntrega);
+      console.log("Entrega registrada correctamente");
+    }
+
   } catch (error) {
-    console.error("Error al registrar la entrega:", error);
+    console.error("Error al registrar o actualizar la entrega:", error);
     throw error;
   }
 }

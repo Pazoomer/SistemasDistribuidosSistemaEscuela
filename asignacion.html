@@ -168,28 +168,6 @@
                 console.error("Error mostrando entregas:", error);
             }
         }
-
-        document.getElementById("entregaForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const link = document.getElementById("archivoAdjunto").value; // Aquí está el texto, que es un link obligatorio
-            const hoy = new Date().toISOString().split("T")[0];
-
-            if (!link) {
-                alert("Por favor ingresa el link del archivo");
-                return;
-            }
-
-            await entregarAsignacion({
-                id_asignacion: asignacion.id,
-                id_alumno: usuario.id,
-                archivo_adjunto: link,  // El "texto" es el link
-                fecha_entrega: hoy
-            });
-
-            alert("Asignación entregada correctamente");
-            document.getElementById("entregaForm").reset();
-        });
     </script>
 </body>
 

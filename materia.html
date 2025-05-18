@@ -49,6 +49,9 @@
 
     if (usuario.rol === "maestro") {
       document.getElementById("formNuevaAsignacion").style.display = "block";
+      document.getElementById("toggleFormBtn").style.display = "block";
+    }else{
+      document.getElementById("toggleFormBtn").style.display = "none";
     }
 
     async function mostrarAsignaciones() {
