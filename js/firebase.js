@@ -29,6 +29,15 @@ const auth = getAuth(app);
 
 console.log("Firebase inicializado correctamente");
 
+export function escucharMensajes(chatId, callback) {
+    const chatRef = ref(db, `chats/${chatId}`);
+
+    onChildAdded(chatRef, (snapshot) => {
+        const mensaje = snapshot.val();
+        callback(mensaje);
+    });
+}
+
 export function enviarMensaje(chatId, remitenteId, texto) {
   const chatRef = ref(db, `chats/${chatId}`);
   const mensaje = {
@@ -73,9 +82,9 @@ export async function obtenerNombreTutorPorId(tutorId) {
     const tutorRef = ref(db, `tutores/${tutorId}/nombre_completo`);
     const snapshot = await get(tutorRef);
     if (snapshot.exists()) {
-      return snapshot.val(); // Devuelve solo el nombre (string)
+      return snapshot.val();
     } else {
-      return null; // No existe ese tutor
+      return null;
     }
   } catch (error) {
     console.error("Error al obtener el nombre del tutor:", error);

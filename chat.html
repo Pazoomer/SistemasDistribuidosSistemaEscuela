@@ -23,25 +23,50 @@
     </div>
 
     <script type="module">
-        import {enviarMensaje } from "./js/firebase.js";
-
-        btnEnviar.addEventListener("click", () => {
-            const texto = input.value.trim();
-            if (texto !== "") {
-                enviarMensaje(chatData.chatId, usuario.id, texto);
-                input.value = "";
-            }
-        });
+        import { enviarMensaje, escucharMensajes } from "./js/firebase.js";
 
         const usuario = JSON.parse(localStorage.getItem("usuarioActual"));
         const chatData = JSON.parse(localStorage.getItem("chatActual"));
 
-        const input = document.getElementById("inputMensaje");
-        const btnEnviar = document.getElementById("btnEnviar");
-        const lista = document.getElementById("mensajesLista");
-        const tituloChat = document.getElementById("tituloChat");
+        document.addEventListener("DOMContentLoaded", () => {
+            const input = document.getElementById("inputMensaje");
+            const btnEnviar = document.getElementById("btnEnviar");
+            const lista = document.getElementById("mensajesLista");
+            const tituloChat = document.getElementById("tituloChat");
 
-        tituloChat.textContent = `Chat con: ${chatData.otroUsuarioId}`;
+            tituloChat.textContent = `Chat con: ${chatData.otroUsuarioId}`;
+
+            btnEnviar.addEventListener("click", () => {
+                const texto = input.value.trim();
+                if (texto !== "") {
+                    enviarMensaje(chatData.chatId, usuario.id, texto);
+                    input.value = "";
+                }
+            });
+
+            function agregarMensaje(mensaje) {
+                const li = document.createElement("li");
+                li.classList.add("mensaje");
+
+                if (mensaje.remitenteId === usuario.id) {
+                    li.classList.add("propio");
+                } else {
+                    li.classList.add("otro");
+                }
+
+                li.innerHTML = `
+            <div>${mensaje.texto}</div>
+            <div class="hora">${mensaje.hora || ''}</div>
+        `;
+
+                lista.appendChild(li);
+                lista.scrollTop = lista.scrollHeight;
+            }
+
+            escucharMensajes(chatData.chatId, (mensaje) => {
+                agregarMensaje(mensaje);
+            });
+        });
     </script>
 </body>
 
