@@ -6,6 +6,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chat</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      ul#mensajesLista {
+        list-style: none;
+        padding: 0;
+      }
+      ul#mensajesLista li.mensaje {
+        max-width: 60%;
+        margin: 5px 0;
+        padding: 8px 12px;
+        border-radius: 15px;
+        position: relative;
+        word-wrap: break-word;
+      }
+      ul#mensajesLista li.mensaje.propio {
+        background-color: #dcf8c6;
+        margin-left: auto;
+        text-align: right;
+      }
+      ul#mensajesLista li.mensaje.otro {
+        background-color: #ffffff;
+        margin-right: auto;
+        text-align: left;
+      }
+      ul#mensajesLista li.mensaje .hora {
+        font-size: 0.7rem;
+        color: #999;
+        margin-top: 3px;
+      }
+    </style>
 </head>
 
 <body class="container mt-4">
@@ -37,7 +66,6 @@
 
             tituloChat.textContent = `Chat con: ${nombreTutor}`;
             
-
             btnEnviar.addEventListener("click", () => {
                 const texto = input.value.trim();
                 if (texto !== "") {
@@ -57,9 +85,9 @@
                 }
 
                 li.innerHTML = `
-            <div>${mensaje.texto}</div>
-            <div class="hora">${mensaje.hora || ''}</div>
-        `;
+                    <div>${mensaje.texto}</div>
+                    <div class="hora">${mensaje.hora || ''}</div>
+                `;
 
                 lista.appendChild(li);
                 lista.scrollTop = lista.scrollHeight;
