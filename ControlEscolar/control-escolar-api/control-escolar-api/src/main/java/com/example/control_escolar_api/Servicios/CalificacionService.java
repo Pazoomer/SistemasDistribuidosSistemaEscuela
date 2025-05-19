@@ -1,6 +1,6 @@
 package com.example.control_escolar_api.Servicios;
 
-import com.example.control_escolar_api.Entidades.Calificacion;
+import com.example.control_escolar_api.Entidades.Calificaciones;
 import com.example.control_escolar_api.Repositorios.CalificacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,17 +19,17 @@ public class CalificacionService {
     }
 
     // Obtener todos las calificaciones
-    public List<Calificacion> obtenerTodos() {
+    public List<Calificaciones> obtenerTodos() {
         return repo.findAll();
     }
 
     // Guardar un nueva calificacion
-    public Calificacion guardar(Calificacion Calificacion) {
+    public Calificaciones guardar(Calificaciones Calificacion) {
         return repo.save(Calificacion);
     }
 
     // Obtener calificacion por ID
-    public Optional<Calificacion> obtenerPorId(Long id) {
+    public Optional<Calificaciones> obtenerPorId(Long id) {
         return repo.findById(id);
     }
 

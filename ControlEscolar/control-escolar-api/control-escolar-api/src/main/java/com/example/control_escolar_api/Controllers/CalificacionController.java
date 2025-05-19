@@ -1,6 +1,6 @@
 package com.example.control_escolar_api.Controllers;
 
-import com.example.control_escolar_api.Entidades.Calificacion;
+import com.example.control_escolar_api.Entidades.Calificaciones;
 import com.example.control_escolar_api.Servicios.CalificacionService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +18,7 @@ public class CalificacionController {
     }
 
     @GetMapping
-    public List<Calificacion> getCalificaciones() {
+    public List<Calificaciones> getCalificaciones() {
         return service.obtenerTodos();
     }
 }
