@@ -62,7 +62,9 @@ public class AppCalificaciones extends JFrame {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
-                jwtToken = response.body(); // Aquí asumo que el body ES el token directamente
+                ObjectMapper mapper = new ObjectMapper();
+                Map<String, String> jsonToken = mapper.readValue(response.body(), new TypeReference<>() {});
+                jwtToken = jsonToken.get("token");
                 obtenerCalificaciones();
             } else {
                 JOptionPane.showMessageDialog(this, "Error de login: " + response.statusCode());
