@@ -11,7 +11,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 
-public class AppCalifaciones extends JFrame {
+public class AppCalificaciones extends JFrame {
 
     private JTextField userField;
     private JPasswordField passField;
@@ -19,8 +19,8 @@ public class AppCalifaciones extends JFrame {
     private JTable table;
     private String jwtToken = "";
 
-    public AppCalifaciones() {
-        setTitle("Login y Maestros");
+    public AppCalificaciones() {
+        setTitle("Login y Calificaciones");
         setSize(600, 400);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -51,7 +51,7 @@ public class AppCalifaciones extends JFrame {
 
         try {
             HttpClient client = HttpClient.newHttpClient();
-            String json = String.format("{\"usuario\":\"%s\",\"contrasena\":\"%s\"}", usuario, contrasena);
+            String json = String.format("{\"usuario\":\"%s\",\"password\":\"%s\"}", usuario, contrasena);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("http://localhost:8080/api/login"))
@@ -63,7 +63,7 @@ public class AppCalifaciones extends JFrame {
 
             if (response.statusCode() == 200) {
                 jwtToken = response.body(); // Aquí asumo que el body ES el token directamente
-                obtenerMaestros();
+                obtenerCalificaciones();
             } else {
                 JOptionPane.showMessageDialog(this, "Error de login: " + response.statusCode());
             }
@@ -74,11 +74,11 @@ public class AppCalifaciones extends JFrame {
         }
     }
 
-    private void obtenerMaestros() {
+    private void obtenerCalificaciones() {
         try {
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("http://localhost:8080/api/maestros"))
+                    .uri(URI.create("http://localhost:8080/api/calificacion"))
                     .header("Authorization", "Bearer " + jwtToken)
                     .GET()
                     .build();
@@ -87,35 +87,36 @@ public class AppCalifaciones extends JFrame {
 
             if (response.statusCode() == 200) {
                 ObjectMapper mapper = new ObjectMapper();
-                List<Map<String, Object>> maestros = mapper.readValue(
+                List<Map<String, Object>> calificaciones = mapper.readValue(
                         response.body(), new TypeReference<List<Map<String, Object>>>() {}
                 );
 
-                mostrarMaestrosEnTabla(maestros);
+                mostrarCalificacionesEnTabla(calificaciones);
             } else {
-                JOptionPane.showMessageDialog(this, "Error al obtener maestros: " + response.statusCode());
+                System.out.println(response);
+                JOptionPane.showMessageDialog(this, "Error al obtener calificaciones: " + response.statusCode());
             }
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error al obtener maestros");
+            JOptionPane.showMessageDialog(this, "Error al obtener calificaciones");
         }
     }
 
-    private void mostrarMaestrosEnTabla(List<Map<String, Object>> maestros) {
-        if (maestros.isEmpty()) return;
+    private void mostrarCalificacionesEnTabla(List<Map<String, Object>> calificaciones) {
+        if (calificaciones.isEmpty()) return;
 
         DefaultTableModel model = new DefaultTableModel();
         // Agregar columnas
-        maestros.get(0).keySet().forEach(model::addColumn);
+        calificaciones.get(0).keySet().forEach(model::addColumn);
         // Agregar filas
-        for (Map<String, Object> m : maestros) {
+        for (Map<String, Object> m : calificaciones) {
             model.addRow(m.values().toArray());
         }
         table.setModel(model);
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new AppMaestros().setVisible(true));
+        SwingUtilities.invokeLater(() -> new AppCalificaciones().setVisible(true));
     }
 }
