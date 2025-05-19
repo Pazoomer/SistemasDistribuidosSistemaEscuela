@@ -61,6 +61,16 @@ export async function escucharMensajes(chatId, callback) {
   }
 }
 
+export function enviarMensaje(chatId, remitenteId, texto) {
+  const chatRef = ref(db, `chats/${chatId}`);
+  const mensaje = {
+    texto: texto,
+    remitenteId: remitenteId,
+    timestamp: Date.now()
+  };
+  return push(chatRef, mensaje);
+}
+
 export async function obtenerTodosLosChatsDeUsuario(usuarioActualId) {
   const chatsRef = ref(db, "chats");
 
