@@ -24,29 +24,38 @@ public class JwtFilter implements Filter {
         HttpServletResponse res = (HttpServletResponse) response;
 
         String path = req.getServletPath();
-        System.out.println(">>> Solicitud a: " + path);
-
         String authHeader = req.getHeader("Authorization");
 
-        // Permitir sin token: login y errores
+        // Permitir login sin token
         if (path.equals("/api/login") || path.startsWith("/error")) {
             chain.doFilter(request, response);
             return;
         }
 
-        // Validar token JWT
+        // Validar y autenticar token
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
 
             if (jwtUtil.validarToken(token)) {
+                String username = jwtUtil.extraerUsuario(token);
+
+                // Crear objeto de autenticación sin roles
+                var auth = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                        username, null, java.util.Collections.emptyList()
+                );
+
+                // Registrar al usuario como autenticado en el contexto
+                org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
+
                 chain.doFilter(request, response);
                 return;
             }
         }
 
-        // Si no hay token válido
+        // Si no es válido
         res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido o ausente");
     }
+
 
     @Override
     public void init(FilterConfig filterConfig) {}
