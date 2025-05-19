@@ -17,7 +17,7 @@
     </div>
 
     <script type="module">
-        import { obtenerTodosLosChatsDeUsuario } from './js/firebase.js';
+        import { obtenerTodosLosChatsDeUsuario, obtenerNombreTutorPorId } from './js/firebase.js';
 
         const usuario = JSON.parse(localStorage.getItem("usuarioActual"));
         const listaChats = document.getElementById("listaChats");
@@ -35,14 +35,18 @@
                 return;
             }
 
-            chats.forEach(chat => {
-                const otroUsuarioId = chat.chatId
-                    .split("_")
-                    .find(id => id !== usuario.id);
+            // Limpia la lista antes
+            listaChats.innerHTML = "";
+
+            for (const chat of chats) {
+                const otroUsuarioId = chat.chatId.split("_").find(id => id !== usuario.id);
+
+                // Obtener el nombre del tutor
+                const nombreTutor = await obtenerNombreTutorPorId(otroUsuarioId) || otroUsuarioId;
 
                 const li = document.createElement("li");
                 li.className = "list-group-item list-group-item-action";
-                li.textContent = `Chat con: ${otroUsuarioId}`;
+                li.textContent = `Chat con: ${nombreTutor}`;
                 li.style.cursor = "pointer";
                 li.addEventListener("click", () => {
                     localStorage.setItem("chatActual", JSON.stringify({
@@ -53,7 +57,7 @@
                 });
 
                 listaChats.appendChild(li);
-            });
+            }
         }
 
         mostrarChats();

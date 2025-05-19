@@ -68,6 +68,21 @@ export async function obtenerTodosLosChatsDeUsuario(usuarioActualId) {
   }
 }
 
+export async function obtenerNombreTutorPorId(tutorId) {
+  try {
+    const tutorRef = ref(db, `tutores/${tutorId}/nombre_completo`);
+    const snapshot = await get(tutorRef);
+    if (snapshot.exists()) {
+      return snapshot.val(); // Devuelve solo el nombre (string)
+    } else {
+      return null; // No existe ese tutor
+    }
+  } catch (error) {
+    console.error("Error al obtener el nombre del tutor:", error);
+    return null;
+  }
+}
+
 export async function obtenerEntregasPorAsignacion(idAsignacion) {
   const dbRef = ref(db);
 
