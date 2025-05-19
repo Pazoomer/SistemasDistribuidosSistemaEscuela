@@ -3,6 +3,7 @@ package zamora.jorge.aplicacionescuela
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -14,6 +15,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
+import org.json.JSONObject
 import zamora.jorge.aplicacionescuela.data.Alumno
 
 class MainActivity : AppCompatActivity() {
@@ -23,6 +25,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnMaterias: TextView
     private lateinit var btnMensajes: TextView
     private lateinit var btnCerrarSesion: TextView
+    private lateinit var btnBajoRendimiento: Button
+    private var entregasBajasList = mutableListOf<DataSnapshot>()
     private lateinit var database: DatabaseReference
     private lateinit var alumnosRef: DatabaseReference
     private lateinit var auth: FirebaseAuth
@@ -36,6 +40,8 @@ class MainActivity : AppCompatActivity() {
         btnMaterias = findViewById(R.id.btnMaterias)
         btnMensajes = findViewById(R.id.btnMensajes)
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion)
+        btnBajoRendimiento = findViewById(R.id.btnBajoRendimiento)
+        btnBajoRendimiento.visibility = Button.GONE
 
         database = Firebase.database.reference
         alumnosRef = database.child("alumnos")
@@ -84,17 +90,22 @@ class MainActivity : AppCompatActivity() {
                     if (snapshot.hasChildren()) {
                         for (childSnapshot in snapshot.children) {
                             val alumno = childSnapshot.getValue(Alumno::class.java)
-                            val alumnoId = childSnapshot.key  // <- AQUÍ
+                            val alumnoId = childSnapshot.key
                             alumno?.let {
                                 tvNombre.text = "Nombre Alumno: ${it.nombre_completo}"
                                 tvCurp.text = "CURP: ${it.curp}"
 
-                                // Configura el botón de materias con el ID correcto
                                 btnMaterias.setOnClickListener {
                                     val intent = Intent(this@MainActivity, Materias::class.java)
-                                    intent.putExtra("alumnoId", alumnoId) // <- CORRECTO
+                                    intent.putExtra("alumnoId", alumnoId)
                                     startActivity(intent)
                                 }
+
+                                // 🔽 Llama a la función de filtrado
+                                if (alumnoId != null) {
+                                    obtenerEntregasBajas(alumnoId)
+                                }
+
                                 return
                             }
                         }
@@ -110,4 +121,53 @@ class MainActivity : AppCompatActivity() {
                 }
             })
     }
+
+
+    private fun obtenerEntregasBajas(alumnoId: String) {
+        val entregasRef = database.child("asignaciones_entregas")
+        val entregasBajasJsonList = mutableListOf<String>()
+
+        entregasRef.orderByChild("id_alumno").equalTo(alumnoId)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (entregaSnapshot in snapshot.children) {
+                        val calificacion = entregaSnapshot.child("calificacion").getValue(Double::class.java)
+
+                        if (calificacion != null && calificacion <= 7.0) {
+                            val idAsignacion = entregaSnapshot.child("id_asignacion").getValue(String::class.java) ?: ""
+                            val fechaEntrega = entregaSnapshot.child("fecha_entrega").getValue(String::class.java) ?: ""
+                            val archivoAdjunto = entregaSnapshot.child("archivo_adjunto").getValue(String::class.java) ?: ""
+
+                            // Convertir en JSON válido
+                            val entregaJson = JSONObject().apply {
+                                put("id_asignacion", idAsignacion)
+                                put("fecha_entrega", fechaEntrega)
+                                put("calificacion", calificacion)
+                                put("archivo_adjunto", archivoAdjunto)
+                            }
+
+                            entregasBajasJsonList.add(entregaJson.toString())
+                        }
+                    }
+
+                    // Mostrar botón si hay entregas bajas
+                    if (entregasBajasJsonList.isNotEmpty()) {
+                        btnBajoRendimiento.visibility = View.VISIBLE
+
+                        btnBajoRendimiento.setOnClickListener {
+                            val intent = Intent(this@MainActivity, AsignacionesBjas::class.java)
+                            intent.putStringArrayListExtra("entregasBajas", ArrayList(entregasBajasJsonList))
+                            startActivity(intent)
+                        }
+                    } else {
+                        btnBajoRendimiento.visibility = View.GONE
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    println("Error al consultar entregas: ${error.message}")
+                }
+            })
+    }
+
 }
