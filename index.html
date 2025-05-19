@@ -22,6 +22,12 @@
       </button>
     </div>
 
+    <div id="chats" class="mb-3" style="display: none;">
+      <button id="chats" class="btn btn-primary" onclick="window.location.href='index.html'">
+        Chats
+      </button>
+    </div>
+
     <div id="listaMaterias" class="row gy-3"></div>
     <button id="cerrarSesionBtn" class="btn btn-danger">Cerrar sesión</button>
   </div>
@@ -52,6 +58,7 @@
 
     // Mostrar opciones según el rol
     if (rol === "estudiante") {
+      document.getElementById("chats").style.display = "none";
       cargarMateriasPorAlumno(idUsuario)
         .then(materias => {
           console.log("Materias filtradas:", materias);
@@ -107,6 +114,7 @@
     } else if (rol === "maestro") {
       //Boton para subir calificaciones
       document.getElementById("subirCalificacionesDiv").style.display = "block";
+      document.getElementById("chats").style.display = "block";
       const btn = document.getElementById("subirCalificacionesDiv");
       if (btn) {
         btn.addEventListener("click", async () => {

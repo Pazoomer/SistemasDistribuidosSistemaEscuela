@@ -14,6 +14,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
 import zamora.jorge.aplicacionescuela.data.Mensaje
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -27,9 +31,10 @@ class Chat : AppCompatActivity() {
     private lateinit var buttonSendMessage: ImageButton
     private lateinit var chatAdapter: ChatAdapter
     private val listaMensajes = mutableListOf<Mensaje>()
-
-    private val USUARIO_ACTUAL_ID = "usuario_actual_app" // Identificador para el usuario que usa la app
-    private val OTRO_USUARIO_ID = "profesor_juan_perez" // Identificador del contacto
+    private val USUARIO_ACTUAL_ID = "WCwuXdhA6Lg5W0epyoErf79q0Zv1" // Identificador para el usuario que usa la app
+    private val OTRO_USUARIO_ID = "-OOZmkq2hhGdFUMYfyCN" // Identificador del contacto
+    val database = FirebaseDatabase.getInstance()
+    val chatRef = database.getReference("chats/${USUARIO_ACTUAL_ID}_${OTRO_USUARIO_ID}")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,6 +85,23 @@ class Chat : AppCompatActivity() {
         toolbar.setNavigationOnClickListener {
             finish() // O la lógica que prefieras para el botón de atrás
         }
+
+        chatRef.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val mensaje = snapshot.getValue(Mensaje::class.java)
+                mensaje?.let {
+                    it.esEnviado = it.remitenteId == USUARIO_ACTUAL_ID
+                    chatAdapter.addMensaje(it)
+                    recyclerViewMessages.scrollToPosition(chatAdapter.itemCount - 1)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {}
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+        })
+
     }
 
     private fun getCurrentTime(): String {
@@ -88,17 +110,20 @@ class Chat : AppCompatActivity() {
     }
 
     private fun enviarMensaje(texto: String) {
-        val nuevoMensaje = Mensaje(
-            id = UUID.randomUUID().toString(),
+        val mensajeId = UUID.randomUUID().toString()
+        val mensaje = Mensaje(
+            id = mensajeId,
             texto = texto,
             hora = getCurrentTime(),
             esEnviado = true,
             remitenteId = USUARIO_ACTUAL_ID
         )
-        chatAdapter.addMensaje(nuevoMensaje)
+        chatRef.child(mensajeId).setValue(mensaje)
+
+        // Mostrar en UI
+        chatAdapter.addMensaje(mensaje)
         editTextMessage.setText("")
-        recyclerViewMessages.scrollToPosition(chatAdapter.itemCount - 1) // Moverse al último mensaje
-        // simularRespuesta() // Descomenta para probar una respuesta automática
+        recyclerViewMessages.scrollToPosition(chatAdapter.itemCount - 1)
     }
 
     private fun cargarMensajesDeEjemplo() {
@@ -112,25 +137,7 @@ class Chat : AppCompatActivity() {
             recyclerViewMessages.scrollToPosition(chatAdapter.itemCount - 1)
         }
     }
-
-    //    private fun simularRespuesta() {
-    //        android.os.Handler(mainLooper).postDelayed({
-    //            val respuesta = Mensaje(
-    //                id = UUID.randomUUID().toString(),
-    //                texto = "Entendido, gracias.",
-    //                hora = getCurrentTime(),
-    //                esEnviado = false,
-    //                remitenteId = OTRO_USUARIO_ID
-    //            )
-    //            chatAdapter.addMensaje(respuesta)
-    //            recyclerViewMessages.scrollToPosition(chatAdapter.itemCount - 1)
-    //        }, 1500) // Retraso
-    //    }
 }
-
-
-
-
 
 class ChatAdapter(private val mensajes: MutableList<Mensaje>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {

@@ -29,6 +29,47 @@ const auth = getAuth(app);
 
 console.log("Firebase inicializado correctamente");
 
+export function enviarMensaje(chatId, remitenteId, texto) {
+  const chatRef = ref(db, `chats/${chatId}`);
+  const mensaje = {
+    texto: texto,
+    remitenteId: remitenteId,
+    timestamp: Date.now()
+  };
+  return push(chatRef, mensaje);
+}
+
+async function obtenerTodosLosChatsDeUsuario(usuarioActualId) {
+  const db = getDatabase();
+  const chatsRef = ref(db, "chats");
+
+  try {
+    const snapshot = await get(chatsRef);
+    if (snapshot.exists()) {
+      const todosLosChats = snapshot.val();
+      const chatsDelUsuario = [];
+
+      // Recorremos todas las conversaciones
+      for (const chatKey in todosLosChats) {
+        if (chatKey.includes(usuarioActualId)) {
+          const mensajes = Object.values(todosLosChats[chatKey]);
+          chatsDelUsuario.push({
+            chatId: chatKey,
+            mensajes: mensajes
+          });
+        }
+      }
+
+      return chatsDelUsuario; // [{ chatId: "usuario1_usuario2", mensajes: [...] }, ...]
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error("Error al obtener chats:", error);
+    return [];
+  }
+}
+
 export async function obtenerEntregasPorAsignacion(idAsignacion) {
   const dbRef = ref(db);
 

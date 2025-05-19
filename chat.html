@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="container mt-4">
+
+    <div class="mt-4">
+        <a href="chats.html" class="btn btn-secondary">Volver</a>
+    </div>
+
+    <h3 class="mt-3" id="tituloChat">Chat</h3>
+    <ul id="mensajesLista" class="list-group mt-3 mb-3"></ul>
+
+    <div class="input-group">
+        <input type="text" id="inputMensaje" class="form-control" placeholder="Escribe un mensaje..." />
+        <button class="btn btn-primary" id="btnEnviar">Enviar</button>
+    </div>
+
+    <script type="module">
+        import { app, enviarMensaje } from "./js/firebase.js";
+
+        btnEnviar.addEventListener("click", () => {
+            const texto = input.value.trim();
+            if (texto !== "") {
+                enviarMensaje(chatData.chatId, usuario.id, texto);
+                input.value = "";
+            }
+        });
+
+        const usuario = JSON.parse(localStorage.getItem("usuarioActual"));
+        const chatData = JSON.parse(localStorage.getItem("chatActual"));
+
+        const input = document.getElementById("inputMensaje");
+        const btnEnviar = document.getElementById("btnEnviar");
+        const lista = document.getElementById("mensajesLista");
+        const tituloChat = document.getElementById("tituloChat");
+
+        tituloChat.textContent = `Chat con: ${chatData.otroUsuarioId}`;
+    </script>
+</body>
+
+</html>

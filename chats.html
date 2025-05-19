@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chats</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="container mt-4">
+    <h2>Mis Chats</h2>
+    <ul id="listaChats" class="list-group mt-3"></ul>
+
+    <div class="mt-4">
+        <a href="index.html" class="btn btn-secondary">Volver</a>
+    </div>
+
+    <script type="module">
+        import { obtenerTodosLosChatsDeUsuario } from './js/firebase.js';
+
+        const usuario = JSON.parse(localStorage.getItem("usuarioActual"));
+        const listaChats = document.getElementById("listaChats");
+
+        async function mostrarChats() {
+            if (!usuario) {
+                alert("No hay sesión activa");
+                return;
+            }
+
+            const chats = await obtenerTodosLosChatsDeUsuario(usuario.id);
+
+            if (chats.length === 0) {
+                listaChats.innerHTML = "<li class='list-group-item'>No hay chats disponibles</li>";
+                return;
+            }
+
+            chats.forEach(chat => {
+                const otroUsuarioId = chat.chatId
+                    .split("_")
+                    .find(id => id !== usuario.id);
+
+                const li = document.createElement("li");
+                li.className = "list-group-item list-group-item-action";
+                li.textContent = `Chat con: ${otroUsuarioId}`;
+                li.style.cursor = "pointer";
+                li.addEventListener("click", () => {
+                    localStorage.setItem("chatActual", JSON.stringify({
+                        chatId: chat.chatId,
+                        otroUsuarioId: otroUsuarioId
+                    }));
+                    window.location.href = "chat.html";
+                });
+
+                listaChats.appendChild(li);
+            });
+        }
+
+        mostrarChats();
+    </script>
+</body>
+
+</html>
