@@ -48,7 +48,6 @@ export async function obtenerTodosLosChatsDeUsuario(usuarioActualId) {
       const todosLosChats = snapshot.val();
       const chatsDelUsuario = [];
 
-      // Recorremos todas las conversaciones
       for (const chatKey in todosLosChats) {
         if (chatKey.includes(usuarioActualId)) {
           const mensajes = Object.values(todosLosChats[chatKey]);
@@ -59,7 +58,7 @@ export async function obtenerTodosLosChatsDeUsuario(usuarioActualId) {
         }
       }
 
-      return chatsDelUsuario; // [{ chatId: "usuario1_usuario2", mensajes: [...] }, ...]
+      return chatsDelUsuario;
     } else {
       return [];
     }

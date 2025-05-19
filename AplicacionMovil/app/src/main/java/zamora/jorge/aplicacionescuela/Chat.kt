@@ -121,7 +121,7 @@ class Chat : AppCompatActivity() {
         chatRef.child(mensajeId).setValue(mensaje)
 
         // Mostrar en UI
-        chatAdapter.addMensaje(mensaje)
+        //chatAdapter.addMensaje(mensaje)
         editTextMessage.setText("")
         recyclerViewMessages.scrollToPosition(chatAdapter.itemCount - 1)
     }
