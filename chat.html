@@ -33,8 +33,10 @@
             const btnEnviar = document.getElementById("btnEnviar");
             const lista = document.getElementById("mensajesLista");
             const tituloChat = document.getElementById("tituloChat");
+            const nombreTutor = localStorage.getItem("Tutor");
 
-            tituloChat.textContent = `Chat con: ${chatData.otroUsuarioId}`;
+            tituloChat.textContent = `Chat con: ${nombreTutor}`;
+            
 
             btnEnviar.addEventListener("click", () => {
                 const texto = input.value.trim();

@@ -8,7 +8,8 @@ import {
   get,
   child,
   update,
-  push
+  push,
+  onChildAdded 
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
 import { getAuth, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
