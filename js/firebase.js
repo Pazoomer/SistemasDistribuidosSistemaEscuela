@@ -29,13 +29,26 @@ const auth = getAuth(app);
 
 console.log("Firebase inicializado correctamente");
 
-export function escucharMensajes(chatId, callback) {
-    const chatRef = ref(db, `chats/${chatId}`);
+export async function escucharMensajes(chatId, callback) {
+  const mensajesRef = ref(db, `chats/${chatId}`);
 
-    onChildAdded(chatRef, (snapshot) => {
-        const mensaje = snapshot.val();
-        callback(mensaje);
-    });
+  // 1. Traer todos los mensajes que ya existen
+  try {
+    const snapshot = await get(mensajesRef);
+    if (snapshot.exists()) {
+      const mensajes = snapshot.val();
+      // mensajes es un objeto con keys (ids de mensajes) y valores (mensaje)
+      Object.values(mensajes).forEach(mensaje => callback(mensaje));
+    }
+  } catch (error) {
+    console.error("Error al obtener mensajes:", error);
+  }
+
+  // 2. Escuchar nuevos mensajes en tiempo real
+  onChildAdded(mensajesRef, (snapshot) => {
+    const mensaje = snapshot.val();
+    callback(mensaje);
+  });
 }
 
 export function enviarMensaje(chatId, remitenteId, texto) {
