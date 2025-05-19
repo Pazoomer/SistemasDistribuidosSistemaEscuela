@@ -39,8 +39,7 @@ export function enviarMensaje(chatId, remitenteId, texto) {
   return push(chatRef, mensaje);
 }
 
-async function obtenerTodosLosChatsDeUsuario(usuarioActualId) {
-  const db = getDatabase();
+export async function obtenerTodosLosChatsDeUsuario(usuarioActualId) {
   const chatsRef = ref(db, "chats");
 
   try {
