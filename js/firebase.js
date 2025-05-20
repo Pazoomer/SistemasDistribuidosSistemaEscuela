@@ -63,13 +63,22 @@ export async function escucharMensajes(chatId, callback) {
 
 export function enviarMensaje(chatId, remitenteId, texto) {
   const chatRef = ref(db, `chats/${chatId}`);
+
+  const horaFormateada = new Date().toLocaleTimeString('es-MX', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
+
   const mensaje = {
     texto: texto,
     remitenteId: remitenteId,
-    timestamp: Date.now()
+    hora: horaFormateada
   };
+
   return push(chatRef, mensaje);
 }
+
 
 export async function obtenerTodosLosChatsDeUsuario(usuarioActualId) {
   const chatsRef = ref(db, "chats");
