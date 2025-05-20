@@ -9,7 +9,10 @@ import {
   child,
   update,
   push,
-  onChildAdded 
+  onChildAdded,
+  query,
+  orderByKey,
+  startAfter
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 
 import { getAuth, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
